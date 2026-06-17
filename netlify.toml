@@ -2,9 +2,5 @@
   command = "npm run build"
   publish = ".output/public"
 
-[functions]
-  directory = ".netlify/functions-internal"
-  node_bundler = "none"
-
 [build.environment]
   NODE_VERSION = "22"
