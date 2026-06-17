@@ -1,11 +1,7 @@
 [build]
-  command = "quasar build -m pwa"
-  publish = "dist/pwa"
+  command = "npm run build"
+  publish = ".output/public"
 
 [build.environment]
   NODE_VERSION = "22"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  NITRO_PRESET = "netlify"
