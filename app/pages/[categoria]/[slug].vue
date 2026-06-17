@@ -2,7 +2,16 @@
 import type { Article } from '~/types/article'
 
 const route = useRoute()
+const router = useRouter()
 const client = useSupabaseClient()
+
+function goBack() {
+  if (window.history.state?.back) {
+    router.back()
+  } else {
+    router.push(`/${catSlug}`)
+  }
+}
 const catSlug = route.params.categoria as string
 const artSlug = route.params.slug as string
 
@@ -38,9 +47,9 @@ useHead({
   <div class="page-root">
     <div class="article-hero">
       <div class="hero-inner">
-        <NuxtLink :to="`/${catSlug}`" class="back-link">
-          ← {{ article!.category?.name ?? 'Voltar' }}
-        </NuxtLink>
+        <button class="back-link" @click="goBack">
+          ← Voltar
+        </button>
 
         <div class="article-meta">
           <span v-if="article!.state" class="meta-badge">{{ article!.state }}</span>
@@ -88,10 +97,14 @@ useHead({
 .back-link {
   display: inline-block;
   color: rgba(245, 241, 230, 0.7);
-  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
   font-size: 14px;
   font-weight: 500;
+  font-family: 'Inter', sans-serif;
   margin-bottom: 32px;
+  cursor: pointer;
   transition: color 0.2s ease;
 }
 .back-link:hover {
