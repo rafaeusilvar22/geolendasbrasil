@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/admin/login',
       callback: '/admin/confirm',
-      exclude: ['/', '/lendas', '/lendas/**', '/historias', '/historias/**', '/geografia', '/geografia/**', '/tradicoes', '/tradicoes/**'],
+      exclude: ['/**'],
     },
   },
   fonts: {
