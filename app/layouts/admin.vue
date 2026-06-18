@@ -61,6 +61,13 @@ async function handleLogout() {
             <Icon name="heroicons:adjustments-horizontal" class="sidebar-icon" />
             Navegação
           </NuxtLink>
+
+          <div class="sidebar-divider" />
+
+          <a href="/" target="_blank" rel="noopener" class="sidebar-link sidebar-link--external">
+            <Icon name="heroicons:arrow-top-right-on-square" class="sidebar-icon" />
+            Ver site
+          </a>
         </nav>
       </aside>
     </div>
@@ -142,7 +149,7 @@ async function handleLogout() {
 
 /* MAIN */
 .admin-main {
-  padding: 40px;
+  padding: 0;
 }
 
 /* SIDEBAR */
@@ -204,6 +211,20 @@ async function handleLogout() {
   flex-shrink: 0;
 }
 
+.sidebar-divider {
+  height: 1px;
+  background: rgba(245, 241, 230, 0.1);
+  margin: 8px 12px;
+}
+
+.sidebar-link--external {
+  color: rgba(245, 241, 230, 0.5);
+  font-size: 13px;
+}
+.sidebar-link--external:hover {
+  color: rgba(245, 241, 230, 0.85);
+}
+
 @media (max-width: 640px) {
   .admin-header {
     padding: 0 16px 0 8px;
@@ -211,10 +232,6 @@ async function handleLogout() {
 
   .admin-email {
     display: none;
-  }
-
-  .admin-main {
-    padding: 24px 20px;
   }
 }
 </style>

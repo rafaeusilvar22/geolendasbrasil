@@ -6,16 +6,71 @@ definePageMeta({ layout: 'admin' })
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const client = useSupabaseClient<any>()
 
-const { data: articles, refresh } = await useAsyncData<(Article & { category: Category | null })[]>(
+const STATES = [
+  'Acre', 'Alagoas', 'Amapá', 'Amazonas', 'Bahia', 'Ceará',
+  'Distrito Federal', 'Espírito Santo', 'Goiás', 'Maranhão',
+  'Mato Grosso', 'Mato Grosso do Sul', 'Minas Gerais', 'Pará',
+  'Paraíba', 'Paraná', 'Pernambuco', 'Piauí', 'Rio de Janeiro',
+  'Rio Grande do Norte', 'Rio Grande do Sul', 'Rondônia', 'Roraima',
+  'Santa Catarina', 'São Paulo', 'Sergipe', 'Tocantins',
+]
+
+const PAGE_SIZE = 20
+const page = ref(1)
+const categoryFilter = ref<number | ''>('')
+const stateFilter = ref('')
+const searchInput = ref('')
+const searchQuery = ref('')
+
+const hasFilters = computed(() => !!categoryFilter.value || !!stateFilter.value || !!searchQuery.value)
+
+let searchTimeout: ReturnType<typeof setTimeout>
+watch(searchInput, (val) => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    searchQuery.value = val.trim()
+    page.value = 1
+  }, 350)
+})
+
+watch([categoryFilter, stateFilter], () => { page.value = 1 })
+
+function clearFilters() {
+  searchInput.value = ''
+  searchQuery.value = ''
+  categoryFilter.value = ''
+  stateFilter.value = ''
+  page.value = 1
+}
+
+const { data: categoriesData } = await useCategories()
+const categories = computed(() => categoriesData.value ?? [])
+
+const { data, refresh } = await useAsyncData(
   'admin-articles',
   async () => {
-    const { data } = await client
+    const from = (page.value - 1) * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
+
+    let query = client
       .from('articles')
-      .select('*, category:categories(id,name)')
+      .select('*, category:categories(id,name)', { count: 'exact' })
       .order('created_at', { ascending: false })
-    return data ?? []
+      .range(from, to)
+
+    if (categoryFilter.value) query = query.eq('category_id', categoryFilter.value)
+    if (stateFilter.value) query = query.eq('state', stateFilter.value)
+    if (searchQuery.value) query = query.ilike('title', `%${searchQuery.value}%`)
+
+    const { data, count } = await query
+    return { articles: (data ?? []) as (Article & { category: Category | null })[], total: count ?? 0 }
   },
+  { watch: [page, categoryFilter, stateFilter, searchQuery] },
 )
+
+const articles = computed(() => data.value?.articles ?? [])
+const total = computed(() => data.value?.total ?? 0)
+const totalPages = computed(() => Math.ceil(total.value / PAGE_SIZE))
 
 async function togglePublished(article: Article) {
   await client.from('articles').update({ published: !article.published }).eq('id', article.id)
@@ -25,7 +80,8 @@ async function togglePublished(article: Article) {
 async function deleteArticle(article: Article) {
   if (!confirm(`Excluir o artigo "${article.title}"?`)) return
   await client.from('articles').delete().eq('id', article.id)
-  await refresh()
+  if (articles.value.length === 1 && page.value > 1) page.value--
+  else await refresh()
 }
 
 function formattedDate(str: string) {
@@ -40,6 +96,38 @@ function formattedDate(str: string) {
       <NuxtLink to="/admin/articles/new" class="btn-new">+ Novo artigo</NuxtLink>
     </div>
 
+    <!-- Filtros -->
+    <div class="filters">
+      <div class="filter-search">
+        <Icon name="heroicons:magnifying-glass" class="search-icon" />
+        <input
+          v-model="searchInput"
+          class="search-input"
+          type="text"
+          placeholder="Buscar por título..."
+        />
+        <button v-if="searchInput" class="search-clear" @click="searchInput = ''">✕</button>
+      </div>
+
+      <select v-model="categoryFilter" class="filter-select">
+        <option value="">Todas as categorias</option>
+        <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+      </select>
+
+      <select v-model="stateFilter" class="filter-select">
+        <option value="">Todos os estados</option>
+        <option v-for="state in STATES" :key="state" :value="state">{{ state }}</option>
+      </select>
+
+      <button v-if="hasFilters" class="btn-clear" @click="clearFilters">Limpar filtros</button>
+    </div>
+
+    <!-- Contagem de resultados -->
+    <p v-if="hasFilters" class="results-count">
+      {{ total }} {{ total === 1 ? 'artigo encontrado' : 'artigos encontrados' }}
+    </p>
+
+    <!-- Desktop: tabela -->
     <div class="table-wrapper">
       <table class="table">
         <thead>
@@ -72,25 +160,63 @@ function formattedDate(str: string) {
               <button class="action-delete" @click="deleteArticle(article)">Excluir</button>
             </td>
           </tr>
-          <tr v-if="!articles?.length">
-            <td colspan="6" class="td-empty">Nenhum artigo cadastrado.</td>
+          <tr v-if="!articles.length">
+            <td colspan="6" class="td-empty">Nenhum artigo encontrado.</td>
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Mobile: cards -->
+    <div class="card-list">
+      <div v-if="!articles.length" class="card-empty">Nenhum artigo encontrado.</div>
+      <div v-for="article in articles" :key="article.id" class="card">
+        <div class="card-top">
+          <span class="card-title">{{ article.title }}</span>
+          <button
+            class="status-badge"
+            :class="article.published ? 'status-badge--published' : 'status-badge--draft'"
+            @click="togglePublished(article)"
+          >
+            {{ article.published ? 'Publicado' : 'Rascunho' }}
+          </button>
+        </div>
+        <div class="card-meta">
+          <span v-if="article.category">{{ article.category.name }}</span>
+          <span v-if="article.category && article.state" class="meta-sep">·</span>
+          <span v-if="article.state">{{ article.state }}</span>
+          <span v-if="(article.category || article.state)" class="meta-sep">·</span>
+          <span class="meta-date">{{ formattedDate(article.created_at) }}</span>
+        </div>
+        <div class="card-actions">
+          <NuxtLink :to="`/admin/articles/${article.id}`" class="action-edit">Editar</NuxtLink>
+          <button class="action-delete" @click="deleteArticle(article)">Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paginação -->
+    <div v-if="totalPages > 1" class="pagination">
+      <button class="page-btn" :disabled="page === 1" @click="page--">← Anterior</button>
+      <span class="page-info">
+        Página {{ page }} de {{ totalPages }}
+        <span class="page-total">({{ total }} artigos)</span>
+      </span>
+      <button class="page-btn" :disabled="page === totalPages" @click="page++">Próxima →</button>
     </div>
   </div>
 </template>
 
 <style scoped>
 .page {
-  padding: 40px;
+  padding: 32px 40px;
 }
 
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .page-title {
@@ -116,6 +242,110 @@ function formattedDate(str: string) {
   background: #1b4332;
 }
 
+/* FILTROS */
+.filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 11px;
+  width: 16px;
+  height: 16px;
+  color: #aaa;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.search-input {
+  width: 100%;
+  padding: 9px 32px 9px 34px;
+  border: 1.5px solid #d9cfc1;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: #1a1a1a;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.search-input::placeholder {
+  color: #bbb;
+}
+.search-input:focus {
+  border-color: #2d6a4f;
+}
+
+.search-clear {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  line-height: 1;
+}
+.search-clear:hover {
+  color: #555;
+}
+
+.filter-select {
+  padding: 9px 12px;
+  border: 1.5px solid #d9cfc1;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: #1a1a1a;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  min-width: 170px;
+}
+.filter-select:focus {
+  border-color: #2d6a4f;
+}
+
+.btn-clear {
+  padding: 9px 14px;
+  background: transparent;
+  border: 1.5px solid #d9cfc1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #8b6f47;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.btn-clear:hover {
+  border-color: #8b6f47;
+  color: #3d2817;
+}
+
+.results-count {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #8b6f47;
+  margin: 0 0 16px 0;
+}
+
+/* TABLE (desktop) */
 .table-wrapper {
   background: #fff;
   border-radius: 10px;
@@ -197,6 +427,7 @@ function formattedDate(str: string) {
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   transition: opacity 0.15s ease;
+  white-space: nowrap;
 }
 .status-badge:hover {
   opacity: 0.8;
@@ -238,5 +469,151 @@ function formattedDate(str: string) {
 }
 .action-delete:hover {
   text-decoration: underline;
+}
+
+/* CARDS (mobile) */
+.card-list {
+  display: none;
+}
+
+.card-empty {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  padding: 40px 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.card-meta {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #8b6f47;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.meta-sep {
+  color: #ccc;
+}
+
+.meta-date {
+  color: #999;
+}
+
+.card-actions {
+  display: flex;
+  gap: 16px;
+  padding-top: 4px;
+  border-top: 1px solid #f0ebe0;
+}
+
+/* PAGINAÇÃO */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  font-family: 'Inter', sans-serif;
+}
+
+.page-btn {
+  padding: 8px 16px;
+  background: #fff;
+  border: 1.5px solid #d9cfc1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3d2817;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s ease;
+}
+.page-btn:hover:not(:disabled) {
+  border-color: #2d6a4f;
+  color: #2d6a4f;
+}
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 13px;
+  color: #555;
+}
+
+.page-total {
+  color: #999;
+  margin-left: 4px;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 24px 16px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-search {
+    min-width: unset;
+  }
+
+  .filter-select {
+    min-width: unset;
+  }
+
+  .table-wrapper {
+    display: none;
+  }
+
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pagination {
+    gap: 8px;
+  }
+
+  .page-info {
+    font-size: 12px;
+    text-align: center;
+  }
 }
 </style>

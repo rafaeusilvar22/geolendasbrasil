@@ -114,6 +114,7 @@ async function deleteCategory(cat: Category) {
       <button class="btn-new" @click="openCreate">+ Nova categoria</button>
     </div>
 
+    <!-- Desktop: tabela -->
     <div class="table-wrapper">
       <table class="table">
         <thead>
@@ -147,6 +148,27 @@ async function deleteCategory(cat: Category) {
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Mobile: cards -->
+    <div class="card-list">
+      <div v-if="!categories?.length" class="card-empty">Nenhuma categoria cadastrada.</div>
+      <div v-for="cat in categories" :key="cat.id" class="card">
+        <div class="card-top">
+          <div
+            class="gradient-dot"
+            :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
+          />
+          <span class="card-name">{{ cat.name }}</span>
+          <span class="card-order">Ordem {{ cat.sort_order }}</span>
+        </div>
+        <div class="card-slug">{{ cat.slug }}</div>
+        <div v-if="cat.description" class="card-desc">{{ cat.description }}</div>
+        <div class="card-actions">
+          <button class="action-edit" @click="openEdit(cat)">Editar</button>
+          <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
+        </div>
+      </div>
     </div>
 
     <!-- DaisyUI Modal -->
@@ -214,7 +236,7 @@ async function deleteCategory(cat: Category) {
 
 <style scoped>
 .page {
-  padding: 40px;
+  padding: 32px 40px;
 }
 
 .page-header {
@@ -248,7 +270,7 @@ async function deleteCategory(cat: Category) {
   background: #1b4332;
 }
 
-/* TABLE */
+/* TABLE (desktop) */
 .table-wrapper {
   background: #fff;
   border-radius: 10px;
@@ -342,6 +364,7 @@ async function deleteCategory(cat: Category) {
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   padding: 0;
+  text-decoration: none;
 }
 .action-edit:hover {
   text-decoration: underline;
@@ -359,6 +382,70 @@ async function deleteCategory(cat: Category) {
 }
 .action-delete:hover {
   text-decoration: underline;
+}
+
+/* CARDS (mobile) */
+.card-list {
+  display: none;
+}
+
+.card-empty {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  padding: 40px 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  flex: 1;
+}
+
+.card-order {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: #999;
+  white-space: nowrap;
+}
+
+.card-slug {
+  font-family: monospace;
+  font-size: 13px;
+  color: #8b6f47;
+}
+
+.card-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.card-actions {
+  display: flex;
+  gap: 16px;
+  padding-top: 8px;
+  border-top: 1px solid #f0ebe0;
 }
 
 /* MODAL */
@@ -508,5 +595,30 @@ async function deleteCategory(cat: Category) {
 .btn-save:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 24px 16px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .table-wrapper {
+    display: none;
+  }
+
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modal-box {
+    padding: 24px 20px;
+    margin: 0 16px;
+  }
 }
 </style>

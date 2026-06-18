@@ -28,6 +28,7 @@ useHead({ title: 'Navegação — Admin' })
       </div>
     </div>
 
+    <!-- Desktop: tabela -->
     <div class="table-wrapper">
       <table class="table">
         <thead>
@@ -48,22 +49,22 @@ useHead({ title: 'Navegação — Admin' })
             </td>
             <td class="td-toggle">
               <button
-                class="toggle"
-                :class="cat.show_in_nav ? 'toggle--on' : 'toggle--off'"
+                class="sw"
+                :class="cat.show_in_nav ? 'sw--on' : 'sw--off'"
                 :aria-label="`${cat.show_in_nav ? 'Desativar' : 'Ativar'} ${cat.name} no menu`"
                 @click="toggle(cat, 'show_in_nav')"
               >
-                <span class="toggle-thumb" />
+                <span class="sw-thumb" />
               </button>
             </td>
             <td class="td-toggle">
               <button
-                class="toggle"
-                :class="cat.show_in_home ? 'toggle--on' : 'toggle--off'"
+                class="sw"
+                :class="cat.show_in_home ? 'sw--on' : 'sw--off'"
                 :aria-label="`${cat.show_in_home ? 'Desativar' : 'Ativar'} ${cat.name} na home`"
                 @click="toggle(cat, 'show_in_home')"
               >
-                <span class="toggle-thumb" />
+                <span class="sw-thumb" />
               </button>
             </td>
           </tr>
@@ -73,12 +74,50 @@ useHead({ title: 'Navegação — Admin' })
         </tbody>
       </table>
     </div>
+
+    <!-- Mobile: cards -->
+    <div class="card-list">
+      <div v-if="!categories?.length" class="card-empty">Nenhuma categoria cadastrada.</div>
+      <div v-for="cat in categories" :key="cat.id" class="card">
+        <div class="card-top">
+          <div
+            class="gradient-dot"
+            :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
+          />
+          <span class="card-name">{{ cat.name }}</span>
+        </div>
+        <div class="card-toggles">
+          <div class="card-toggle-row">
+            <span class="card-toggle-label">Exibir no menu</span>
+            <button
+              class="sw"
+              :class="cat.show_in_nav ? 'sw--on' : 'sw--off'"
+              :aria-label="`${cat.show_in_nav ? 'Desativar' : 'Ativar'} ${cat.name} no menu`"
+              @click="toggle(cat, 'show_in_nav')"
+            >
+              <span class="sw-thumb" />
+            </button>
+          </div>
+          <div class="card-toggle-row">
+            <span class="card-toggle-label">Exibir na home</span>
+            <button
+              class="sw"
+              :class="cat.show_in_home ? 'sw--on' : 'sw--off'"
+              :aria-label="`${cat.show_in_home ? 'Desativar' : 'Ativar'} ${cat.name} na home`"
+              @click="toggle(cat, 'show_in_home')"
+            >
+              <span class="sw-thumb" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .page {
-  padding: 40px;
+  padding: 32px 40px;
 }
 
 .page-header {
@@ -130,6 +169,7 @@ useHead({ title: 'Navegação — Admin' })
 
 .th-center {
   text-align: center;
+  width: 160px;
 }
 
 .table-row {
@@ -163,6 +203,7 @@ useHead({ title: 'Navegação — Admin' })
 
 .td-toggle {
   text-align: center;
+  width: 160px;
 }
 
 .td-empty {
@@ -172,7 +213,7 @@ useHead({ title: 'Navegação — Admin' })
 }
 
 /* Toggle switch */
-.toggle {
+.sw {
   display: inline-flex;
   align-items: center;
   width: 44px;
@@ -182,20 +223,22 @@ useHead({ title: 'Navegação — Admin' })
   cursor: pointer;
   padding: 2px;
   transition: background 0.2s ease;
-  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.toggle--on {
+.sw--on {
   background: #2d6a4f;
 }
 
-.toggle--off {
+.sw--off {
   background: #d9cfc1;
 }
 
-.toggle-thumb {
+.sw-thumb {
   width: 20px;
   height: 20px;
+  min-width: 20px;
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -203,11 +246,87 @@ useHead({ title: 'Navegação — Admin' })
   display: block;
 }
 
-.toggle--on .toggle-thumb {
+.sw--on .sw-thumb {
   transform: translateX(20px);
 }
 
-.toggle--off .toggle-thumb {
+.sw--off .sw-thumb {
   transform: translateX(0);
+}
+
+/* CARDS (mobile) */
+.card-list {
+  display: none;
+}
+
+.card-empty {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  padding: 40px 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.card-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+  border-top: 1px solid #f0ebe0;
+}
+
+.card-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-toggle-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #555;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 24px 16px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .table-wrapper {
+    display: none;
+  }
+
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 </style>

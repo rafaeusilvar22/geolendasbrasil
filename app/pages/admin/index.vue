@@ -10,7 +10,13 @@ definePageMeta({ layout: 'admin' })
 
 <style scoped>
 .dashboard {
-  padding: 48px 40px;
+  padding: 32px 40px;
+}
+
+@media (max-width: 640px) {
+  .dashboard {
+    padding: 24px 16px;
+  }
 }
 
 .dashboard-placeholder {
