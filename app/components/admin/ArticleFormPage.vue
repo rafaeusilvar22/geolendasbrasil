@@ -11,6 +11,45 @@ const props = defineProps<{
 const client = useSupabaseClient<any>()
 const saving = ref(false)
 const error = ref('')
+const aiError = ref('')
+const generatingExcerpt = ref(false)
+
+async function generateExcerpt() {
+  if (!form.title) {
+    aiError.value = 'Preencha o título antes de gerar o resumo.'
+    return
+  }
+  aiError.value = ''
+  generatingExcerpt.value = true
+  try {
+    const categoryName = props.categories.find(c => c.id === form.category_id)?.name
+    const { data, error: fnError } = await client.functions.invoke('generate-excerpt', {
+      body: {
+        title: form.title,
+        category: categoryName,
+        state: form.state,
+        type: form.type,
+      },
+    })
+    if (fnError) {
+      aiError.value = fnError.message ?? 'Erro na Edge Function.'
+      return
+    }
+    if (data?.error) {
+      aiError.value = data.error
+      return
+    }
+    if (data?.excerpt) {
+      form.excerpt = data.excerpt
+    } else {
+      aiError.value = 'A IA não retornou um resumo. Verifique o console.'
+    }
+  } catch (err: unknown) {
+    aiError.value = err instanceof Error ? err.message : 'Erro desconhecido ao chamar a IA.'
+  } finally {
+    generatingExcerpt.value = false
+  }
+}
 
 const states = [
   'Acre', 'Alagoas', 'Amapá', 'Amazonas', 'Bahia', 'Ceará',
@@ -146,7 +185,18 @@ async function handleSubmit() {
         </div>
 
         <div class="field">
-          <label class="field-label" for="f-excerpt">Resumo</label>
+          <div class="field-label-row">
+            <label class="field-label" for="f-excerpt">Resumo</label>
+            <button
+              type="button"
+              class="btn-ai"
+              :disabled="generatingExcerpt || !form.title"
+              @click="generateExcerpt"
+            >
+              {{ generatingExcerpt ? 'Gerando...' : '✦ Gerar com IA' }}
+            </button>
+          </div>
+          <p v-if="aiError" class="ai-error">{{ aiError }}</p>
           <textarea
             id="f-excerpt"
             v-model="form.excerpt"
@@ -330,10 +380,46 @@ async function handleSubmit() {
   gap: 6px;
 }
 
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .field-label {
   font-size: 13px;
   font-weight: 600;
   color: #3d2817;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-ai {
+  padding: 4px 12px;
+  background: transparent;
+  color: #2d6a4f;
+  border: 1.5px solid #2d6a4f;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+.btn-ai:hover:not(:disabled) {
+  background: #2d6a4f;
+  color: #f5f1e6;
+}
+.btn-ai:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ai-error {
+  font-size: 12px;
+  color: #c9724a;
+  margin: 4px 0 0;
   font-family: 'Inter', sans-serif;
 }
 

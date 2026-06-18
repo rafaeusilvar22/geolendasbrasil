@@ -49,14 +49,14 @@ useHead({ link: [{ rel: 'canonical', href: canonicalUrl }] })
       <div
         class="category-hero-bg"
         :style="{
-          '--gradient-from': `#${category!.gradient[0]}`,
-          '--gradient-to': `#${category!.gradient[1]}`,
+          '--gradient-from': `#${category?.gradient?.[0] ?? '2D6A4F'}`,
+          '--gradient-to': `#${category?.gradient?.[1] ?? '8B6F47'}`,
         }"
       />
       <div class="category-hero-content">
-        <h1 class="category-title">{{ category!.name }}</h1>
-        <p v-if="category!.description" class="category-description">
-          {{ category!.description }}
+        <h1 class="category-title">{{ category?.name }}</h1>
+        <p v-if="category?.description" class="category-description">
+          {{ category?.description }}
         </p>
       </div>
     </div>
