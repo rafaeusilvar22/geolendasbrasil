@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/supabase', '@nuxtjs/tailwindcss', '@nuxt/fonts', '@nuxt/icon', '@nuxt/image', '@netlify/nuxt', '@vite-pwa/nuxt'],
+  modules: ['@nuxtjs/supabase', '@nuxtjs/tailwindcss', '@nuxt/fonts', '@nuxt/icon', '@nuxt/image', '@netlify/nuxt', '@vite-pwa/nuxt', 'nuxt-og-image'],
   supabase: {
     redirectOptions: {
       login: '/admin/login',

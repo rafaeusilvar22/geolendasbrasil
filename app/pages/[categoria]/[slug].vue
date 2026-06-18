@@ -37,8 +37,34 @@ const formattedDate = computed(() =>
   }),
 )
 
+const copySuccess = ref(false)
+
+const shareLinks = computed(() => ({
+  whatsapp: `https://wa.me/?text=${encodeURIComponent(article.value!.title + ' — ' + canonicalUrl)}`,
+  twitter: `https://x.com/intent/tweet?text=${encodeURIComponent(article.value!.title)}&url=${encodeURIComponent(canonicalUrl)}`,
+  facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(canonicalUrl)}`,
+}))
+
+async function copyLink() {
+  await navigator.clipboard.writeText(canonicalUrl)
+  copySuccess.value = true
+  setTimeout(() => { copySuccess.value = false }, 2000)
+}
+
 const SITE_URL = 'https://geolendasbrasil.netlify.app'
 const canonicalUrl = `${SITE_URL}/${catSlug}/${artSlug}`
+
+const ogDescription = article.value!.excerpt.length > 120
+  ? article.value!.excerpt.slice(0, 117) + '...'
+  : article.value!.excerpt
+
+defineOgImage('ArticleCard', {
+  title: article.value!.title,
+  description: ogDescription,
+  state: article.value!.state || undefined,
+  category: article.value!.category?.name || undefined,
+})
+
 useSeoMeta({
   title: `${article.value!.title} — GeoLendas Brasil`,
   description: article.value!.excerpt,
@@ -46,10 +72,9 @@ useSeoMeta({
   ogDescription: article.value!.excerpt,
   ogUrl: canonicalUrl,
   ogType: 'article',
-  ogImage: `${SITE_URL}/icon-512x512.png`,
   articlePublishedTime: article.value!.created_at,
   articleModifiedTime: article.value!.updated_at,
-  twitterCard: 'summary',
+  twitterCard: 'summary_large_image',
 })
 useHead({
   link: [{ rel: 'canonical', href: canonicalUrl }],
@@ -99,9 +124,26 @@ useHead({
       <div v-if="article!.content" class="article-content" v-html="article!.content" />
 
       <div class="article-footer">
-        <NuxtLink :to="`/${catSlug}`" class="footer-back">
-          ← Ver todos de {{ article!.category?.name }}
-        </NuxtLink>
+        <button class="footer-back" @click="goBack">
+          ← Voltar
+        </button>
+
+        <div class="share-bar">
+          <span class="share-label">Compartilhar</span>
+          <a :href="shareLinks.whatsapp" target="_blank" rel="noopener" class="share-btn" title="Compartilhar no WhatsApp">
+            <img src="/icons/share-whatsapp.svg" alt="WhatsApp" width="36" height="36">
+          </a>
+          <a :href="shareLinks.twitter" target="_blank" rel="noopener" class="share-btn" title="Compartilhar no X">
+            <img src="/icons/share-twitter.svg" alt="X" width="36" height="36">
+          </a>
+          <a :href="shareLinks.facebook" target="_blank" rel="noopener" class="share-btn" title="Compartilhar no Facebook">
+            <img src="/icons/share-facebook.svg" alt="Facebook" width="36" height="36">
+          </a>
+          <button class="share-btn share-btn--copy" :title="copySuccess ? 'Copiado!' : 'Copiar link'" @click="copyLink">
+            <svg v-if="!copySuccess" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="17" height="17"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="17" height="17"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -280,18 +322,77 @@ useHead({
   margin: 56px auto 0;
   padding-top: 32px;
   border-top: 1px solid var(--pg-article-footer-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .footer-back {
   color: var(--pg-article-link);
-  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
   font-size: 14px;
   font-weight: 600;
   font-family: 'Inter', sans-serif;
+  cursor: pointer;
   transition: color 0.2s ease;
 }
 .footer-back:hover {
   text-decoration: underline;
+  color: var(--pg-article-link);
+}
+
+.share-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--pg-text-muted);
+  font-family: 'Inter', sans-serif;
+  margin-right: 4px;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  text-decoration: none;
+  padding: 0;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.share-btn:hover {
+  transform: scale(1.2);
+  opacity: 0.75;
+}
+
+.share-btn img {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.share-btn--copy {
+  color: var(--pg-text-muted);
+  width: 20px;
+  height: 20px;
+}
+
+[data-theme="forest"] .share-btn img[alt="X"] {
+  filter: invert(1);
 }
 
 @media (max-width: 640px) {
