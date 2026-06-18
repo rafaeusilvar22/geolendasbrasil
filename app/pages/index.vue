@@ -73,9 +73,7 @@ function clearFilters() {
   selectedStates.value = []
 }
 
-useHead({
-  htmlAttrs: { 'data-theme': 'discovery' },
-})
+useHead({ title: 'GeoLendas Brasil' })
 </script>
 
 <template>
@@ -158,16 +156,17 @@ useHead({
 <style scoped>
 .page-root {
   min-height: 100vh;
-  background: #f0ebe0;
+  background: var(--pg-bg);
   font-family: 'Inter', sans-serif;
-  color: #1a1a1a;
+  color: var(--pg-text);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .hero {
   padding: 80px 40px;
-  background: #1b4332;
+  background: var(--pg-hero-bg);
   text-align: center;
-  color: #f5f1e6;
+  color: var(--pg-hero-text);
 }
 
 .hero-inner {
@@ -213,7 +212,7 @@ useHead({
 }
 
 .filter-label {
-  color: #1b4332;
+  color: var(--pg-filter-text);
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -236,24 +235,24 @@ useHead({
 .clear-btn {
   padding: 8px 16px;
   background: transparent;
-  border: 1px solid rgba(27, 67, 50, 0.3);
+  border: 1px solid var(--pg-filter-border);
   border-radius: 20px;
-  color: #1b4332;
+  color: var(--pg-filter-text);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;
 }
 .clear-btn:hover {
-  background: rgba(27, 67, 50, 0.06);
+  background: var(--pg-badge-bg);
 }
 
 .cat-btn {
   padding: 8px 16px;
   background: transparent;
-  border: 1px solid rgba(27, 67, 50, 0.25);
+  border: 1px solid var(--pg-filter-border);
   border-radius: 20px;
-  color: #1b4332;
+  color: var(--pg-filter-text);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -261,23 +260,23 @@ useHead({
   font-family: 'Inter', sans-serif;
 }
 .cat-btn:hover:not(.cat-btn--active) {
-  border-color: #d4845c;
-  color: #d4845c;
+  border-color: var(--pg-accent);
+  color: var(--pg-accent);
   background: rgba(212, 132, 92, 0.08);
 }
 .cat-btn--active {
-  background: #1b4332;
-  border-color: #1b4332;
-  color: #f5f1e6;
+  background: var(--pg-filter-active-bg);
+  border-color: var(--pg-filter-active-bg);
+  color: var(--pg-filter-active-text);
   font-weight: 600;
 }
 
 .state-btn {
   padding: 6px 12px;
   background: transparent;
-  border: 1px solid rgba(139, 111, 71, 0.35);
+  border: 1px solid var(--pg-state-border);
   border-radius: 16px;
-  color: #8b6f47;
+  color: var(--pg-state-text);
   font-size: 11px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -285,13 +284,12 @@ useHead({
   font-family: 'Inter', sans-serif;
 }
 .state-btn:hover:not(.state-btn--active) {
-  border-color: #8b6f47;
-  background: rgba(139, 111, 71, 0.08);
+  background: var(--pg-badge-bg);
 }
 .state-btn--active {
-  background: #8b6f47;
-  border-color: #8b6f47;
-  color: #f5f1e6;
+  background: var(--pg-state-active);
+  border-color: var(--pg-state-active);
+  color: var(--pg-filter-active-text);
   font-weight: 600;
 }
 
@@ -302,7 +300,7 @@ useHead({
 .category-header {
   margin-bottom: 32px;
   padding-bottom: 16px;
-  border-bottom: 2px solid rgba(212, 132, 92, 0.3);
+  border-bottom: 2px solid var(--pg-section-border);
 }
 
 .category-title {
@@ -310,13 +308,13 @@ useHead({
   font-size: 32px;
   font-weight: 700;
   margin: 0;
-  color: #1b4332;
+  color: var(--pg-heading);
   text-transform: capitalize;
 }
 
 .category-count {
   font-size: 13px;
-  color: #8b6f47;
+  color: var(--pg-text-muted);
   margin: 6px 0 0 0;
 }
 
@@ -334,15 +332,15 @@ useHead({
 .empty-state-text {
   font-size: 18px;
   margin: 0;
-  color: #8b6f47;
+  color: var(--pg-text-muted);
 }
 
 .footer {
   padding: 48px 40px 40px;
-  background: #1b4332;
+  background: var(--pg-hero-bg);
   text-align: center;
   font-size: 14px;
-  color: rgba(245, 241, 230, 0.65);
+  color: var(--pg-hero-muted);
 }
 
 .footer-text {

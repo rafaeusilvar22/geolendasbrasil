@@ -10,6 +10,7 @@ export default defineNuxtConfig({
       exclude: ['/**'],
     },
   },
+  css: ['~/assets/css/theme.css'],
   fonts: {
     families: [
       { name: 'Merriweather', weights: ['400', '700'] },

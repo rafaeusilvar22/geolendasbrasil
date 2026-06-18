@@ -62,21 +62,21 @@ const articleUrl = computed(() => {
 
 <style scoped>
 .article-card {
-  background: #f5f1e6;
+  background: var(--pg-card-bg);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: background 0.3s ease, transform 0.25s ease, box-shadow 0.25s ease;
   transform: translateY(0);
   display: block;
   text-decoration: none;
   color: inherit;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--pg-card-border);
 }
 .article-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.11);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.13);
 }
 
 .card-image {
@@ -139,8 +139,8 @@ const articleUrl = computed(() => {
 .state-badge {
   display: inline-block;
   padding: 4px 10px;
-  background: rgba(27, 67, 50, 0.08);
-  color: #1b4332;
+  background: var(--pg-badge-bg);
+  color: var(--pg-badge-text);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -153,13 +153,13 @@ const articleUrl = computed(() => {
   font-size: 18px;
   font-weight: 700;
   margin: 0 0 12px 0;
-  color: #1a1a1a;
+  color: var(--pg-card-title);
   line-height: 1.4;
 }
 
 .card-excerpt {
   font-size: 14px;
-  color: #666;
+  color: var(--pg-card-excerpt);
   margin: 0 0 16px 0;
   line-height: 1.5;
   display: -webkit-box;
@@ -175,17 +175,17 @@ const articleUrl = computed(() => {
   justify-content: space-between;
   align-items: center;
   padding-top: 16px;
-  border-top: 1px solid #e0d9cc;
+  border-top: 1px solid var(--pg-card-divider);
 }
 
 .card-date {
   font-size: 12px;
-  color: #999;
+  color: var(--pg-text-muted);
   font-family: 'Inter', sans-serif;
 }
 
 .read-more {
-  color: #d4845c;
+  color: var(--pg-accent);
   font-size: 14px;
   font-weight: 600;
   font-family: 'Inter', sans-serif;

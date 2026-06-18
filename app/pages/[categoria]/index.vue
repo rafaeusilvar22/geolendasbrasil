@@ -28,10 +28,7 @@ const { data: articles } = await useAsyncData<Article[]>(`articles-${slug}`, asy
   return data ?? []
 })
 
-useHead({
-  title: `${category.value?.name} — GeoLendas Brasil`,
-  htmlAttrs: { 'data-theme': 'discovery' },
-})
+useHead({ title: `${category.value?.name} — GeoLendas Brasil` })
 </script>
 
 <template>
@@ -75,18 +72,19 @@ useHead({
 <style scoped>
 .page-root {
   min-height: 100vh;
-  background: #f0ebe0;
+  background: var(--pg-bg);
   font-family: 'Inter', sans-serif;
-  color: #1a1a1a;
+  color: var(--pg-text);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .category-hero {
   position: relative;
   padding: 80px 40px;
-  background: #1b4332;
+  background: var(--pg-hero-bg);
   text-align: center;
   overflow: hidden;
-  color: #f5f1e6;
+  color: var(--pg-hero-text);
 }
 
 .category-hero-bg {
@@ -137,16 +135,16 @@ useHead({
 
 .empty-state-text {
   font-size: 18px;
-  color: #8b6f47;
+  color: var(--pg-text-muted);
   margin: 0;
 }
 
 .footer {
   padding: 48px 40px 40px;
-  background: #1b4332;
+  background: var(--pg-hero-bg);
   text-align: center;
   font-size: 14px;
-  color: rgba(245, 241, 230, 0.65);
+  color: var(--pg-hero-muted);
 }
 
 .footer-text {

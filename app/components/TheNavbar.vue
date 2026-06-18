@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { data: categories } = await useCategories()
+const { theme, toggle } = useTheme()
 
 const links = computed(() => [
   { label: 'Início', to: '/' },
@@ -24,6 +25,14 @@ const menuOpen = ref(false)
           </NuxtLink>
         </li>
       </ul>
+
+      <button
+        class="theme-toggle"
+        :aria-label="theme === 'discovery' ? 'Ativar modo escuro' : 'Ativar modo claro'"
+        @click="toggle"
+      >
+        <Icon :name="theme === 'discovery' ? 'heroicons:moon' : 'heroicons:sun'" class="theme-icon" />
+      </button>
 
       <button
         class="menu-toggle"
@@ -104,6 +113,28 @@ const menuOpen = ref(false)
   background: rgba(212, 132, 92, 0.12);
 }
 
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  color: rgba(245, 241, 230, 0.75);
+  transition: all 0.2s ease;
+}
+.theme-toggle:hover {
+  background: rgba(245, 241, 230, 0.08);
+  color: #f5f1e6;
+}
+
+.theme-icon {
+  width: 20px;
+  height: 20px;
+}
+
 .menu-toggle {
   display: none;
   flex-direction: column;
@@ -163,7 +194,7 @@ const menuOpen = ref(false)
 
 @media (max-width: 640px) {
   .nav-inner {
-    padding: 0 20px;
+    padding: 0 16px;
   }
 
   .nav-links {

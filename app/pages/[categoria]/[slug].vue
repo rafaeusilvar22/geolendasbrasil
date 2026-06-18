@@ -37,10 +37,7 @@ const formattedDate = computed(() =>
   }),
 )
 
-useHead({
-  title: `${article.value?.title} — GeoLendas Brasil`,
-  htmlAttrs: { 'data-theme': 'discovery' },
-})
+useHead({ title: `${article.value?.title} — GeoLendas Brasil` })
 </script>
 
 <template>
@@ -79,15 +76,16 @@ useHead({
 <style scoped>
 .page-root {
   min-height: 100vh;
-  background: #f0ebe0;
+  background: var(--pg-bg);
   font-family: 'Inter', sans-serif;
-  color: #1a1a1a;
+  color: var(--pg-text);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .article-hero {
   padding: 60px 40px 48px;
-  background: #1b4332;
-  color: #f5f1e6;
+  background: var(--pg-hero-bg);
+  color: var(--pg-hero-text);
 }
 
 .hero-inner {
@@ -97,7 +95,7 @@ useHead({
 
 .back-link {
   display: inline-block;
-  color: rgba(245, 241, 230, 0.65);
+  color: var(--pg-back-link);
   background: none;
   border: none;
   padding: 0;
@@ -109,7 +107,7 @@ useHead({
   transition: color 0.2s ease;
 }
 .back-link:hover {
-  color: #f5f1e6;
+  color: var(--pg-hero-text);
 }
 
 .article-meta {
@@ -122,14 +120,14 @@ useHead({
 .meta-badge {
   display: inline-block;
   padding: 5px 12px;
-  background: rgba(245, 241, 230, 0.12);
-  border: 1px solid rgba(245, 241, 230, 0.2);
+  background: var(--pg-meta-badge-bg);
+  border: 1px solid var(--pg-meta-badge-border);
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #f5f1e6;
+  color: var(--pg-hero-text);
 }
 
 .meta-badge--type {
@@ -144,21 +142,21 @@ useHead({
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 20px 0;
-  color: #f5f1e6;
+  color: var(--pg-hero-text);
 }
 
 .article-date {
   font-size: 14px;
-  color: rgba(245, 241, 230, 0.55);
+  color: var(--pg-hero-muted);
   margin: 0;
 }
 
 .article-body {
-  background: #fff;
+  background: var(--pg-article-bg);
   border-radius: 16px 16px 0 0;
   padding: 56px 40px 80px;
   min-height: 60vh;
-  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
 }
 
 .article-excerpt {
@@ -166,10 +164,10 @@ useHead({
   margin: 0 auto 40px;
   font-size: 18px;
   line-height: 1.7;
-  color: #3d2817;
+  color: var(--pg-article-lead);
   font-weight: 400;
   padding-bottom: 32px;
-  border-bottom: 2px solid rgba(212, 132, 92, 0.3);
+  border-bottom: 2px solid var(--pg-section-border);
   font-family: 'Merriweather', serif;
   font-style: italic;
 }
@@ -179,7 +177,7 @@ useHead({
   margin: 0 auto;
   font-size: 16px;
   line-height: 1.8;
-  color: #1a1a1a;
+  color: var(--pg-article-text);
 }
 
 .article-content :deep(p) {
@@ -190,7 +188,7 @@ useHead({
   font-family: 'Merriweather', serif;
   font-size: 26px;
   font-weight: 700;
-  color: #1b4332;
+  color: var(--pg-h2);
   margin: 2em 0 0.6em 0;
   line-height: 1.3;
 }
@@ -199,7 +197,7 @@ useHead({
   font-family: 'Merriweather', serif;
   font-size: 20px;
   font-weight: 700;
-  color: #2d6a4f;
+  color: var(--pg-h3);
   margin: 1.75em 0 0.5em 0;
   line-height: 1.3;
 }
@@ -215,17 +213,17 @@ useHead({
 }
 
 .article-content :deep(blockquote) {
-  border-left: 4px solid #d4845c;
+  border-left: 4px solid var(--pg-accent);
   padding: 12px 20px;
   margin: 1.5em 0;
-  background: rgba(212, 132, 92, 0.06);
+  background: var(--pg-blockquote-bg);
   border-radius: 0 8px 8px 0;
-  color: #3d2817;
+  color: var(--pg-blockquote-text);
   font-style: italic;
 }
 
 .article-content :deep(a) {
-  color: #2d6a4f;
+  color: var(--pg-article-link);
   text-decoration: underline;
 }
 
@@ -235,11 +233,11 @@ useHead({
   border-radius: 10px;
   margin: 1.5em 0;
   display: block;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .article-content :deep(strong) {
-  color: #1b4332;
+  color: var(--pg-strong);
   font-weight: 700;
 }
 
@@ -247,11 +245,11 @@ useHead({
   max-width: 800px;
   margin: 56px auto 0;
   padding-top: 32px;
-  border-top: 1px solid #e8e0d4;
+  border-top: 1px solid var(--pg-article-footer-border);
 }
 
 .footer-back {
-  color: #2d6a4f;
+  color: var(--pg-article-link);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
@@ -259,7 +257,6 @@ useHead({
   transition: color 0.2s ease;
 }
 .footer-back:hover {
-  color: #1b4332;
   text-decoration: underline;
 }
 
