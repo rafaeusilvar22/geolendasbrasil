@@ -63,19 +63,20 @@ const articleUrl = computed(() => {
 <style scoped>
 .article-card {
   background: #f5f1e6;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   transform: translateY(0);
   display: block;
   text-decoration: none;
   color: inherit;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 .article-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.11);
 }
 
 .card-image {
@@ -138,8 +139,8 @@ const articleUrl = computed(() => {
 .state-badge {
   display: inline-block;
   padding: 4px 10px;
-  background: #e8e0d4;
-  color: #3d2817;
+  background: rgba(27, 67, 50, 0.08);
+  color: #1b4332;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -174,7 +175,7 @@ const articleUrl = computed(() => {
   justify-content: space-between;
   align-items: center;
   padding-top: 16px;
-  border-top: 1px solid #e8e0d4;
+  border-top: 1px solid #e0d9cc;
 }
 
 .card-date {

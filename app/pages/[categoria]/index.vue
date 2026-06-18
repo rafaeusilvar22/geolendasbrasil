@@ -75,24 +75,25 @@ useHead({
 <style scoped>
 .page-root {
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #2d6a4f, #1b4332, #8b6f47);
-  background-attachment: fixed;
+  background: #f0ebe0;
   font-family: 'Inter', sans-serif;
-  color: #f5f1e6;
+  color: #1a1a1a;
 }
 
 .category-hero {
   position: relative;
   padding: 80px 40px;
+  background: #1b4332;
   text-align: center;
   overflow: hidden;
+  color: #f5f1e6;
 }
 
 .category-hero-bg {
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, var(--gradient-from) 0%, var(--gradient-to) 100%);
-  opacity: 0.35;
+  opacity: 0.25;
 }
 
 .category-hero-content {
@@ -126,7 +127,7 @@ useHead({
 .articles-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 32px;
+  gap: 24px;
 }
 
 .empty-state {
@@ -136,16 +137,16 @@ useHead({
 
 .empty-state-text {
   font-size: 18px;
-  opacity: 0.7;
+  color: #8b6f47;
   margin: 0;
 }
 
 .footer {
-  padding: 60px 40px 40px;
-  border-top: 1px solid rgba(245, 241, 230, 0.1);
+  padding: 48px 40px 40px;
+  background: #1b4332;
   text-align: center;
   font-size: 14px;
-  opacity: 0.7;
+  color: rgba(245, 241, 230, 0.65);
 }
 
 .footer-text {
@@ -154,7 +155,7 @@ useHead({
 
 @media (max-width: 640px) {
   .category-hero {
-    padding: 60px 20px;
+    padding: 48px 16px;
   }
 
   .category-title {
@@ -162,7 +163,20 @@ useHead({
   }
 
   .content {
-    padding: 32px 20px;
+    padding: 32px 16px;
+  }
+
+  .articles-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .empty-state {
+    padding: 48px 16px;
+  }
+
+  .footer {
+    padding: 40px 16px 32px;
   }
 }
 </style>

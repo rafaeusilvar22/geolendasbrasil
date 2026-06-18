@@ -57,6 +57,10 @@ async function handleLogout() {
             <Icon name="heroicons:tag" class="sidebar-icon" />
             Categorias
           </NuxtLink>
+          <NuxtLink to="/admin/navigation" class="sidebar-link" active-class="sidebar-link--active">
+            <Icon name="heroicons:adjustments-horizontal" class="sidebar-icon" />
+            Navegação
+          </NuxtLink>
         </nav>
       </aside>
     </div>

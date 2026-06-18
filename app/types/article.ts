@@ -5,6 +5,8 @@ export interface Category {
   description: string | null
   gradient: [string, string]
   sort_order: number
+  show_in_nav: boolean
+  show_in_home: boolean
   created_at: string
 }
 

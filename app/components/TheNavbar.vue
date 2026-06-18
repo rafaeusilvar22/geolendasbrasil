@@ -3,7 +3,7 @@ const { data: categories } = await useCategories()
 
 const links = computed(() => [
   { label: 'Início', to: '/' },
-  ...(categories.value ?? []).map((c) => ({ label: c.name, to: `/${c.slug}` })),
+  ...(categories.value ?? []).filter((c) => c.show_in_nav).map((c) => ({ label: c.name, to: `/${c.slug}` })),
 ])
 
 const menuOpen = ref(false)

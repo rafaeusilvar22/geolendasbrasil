@@ -30,8 +30,10 @@ const { data: articles } = await useAsyncData<Article[]>('homepage-articles', as
 const selectedCategories = ref<number[]>([])
 const selectedStates = ref<string[]>([])
 
+const homeCategories = computed(() => (categories.value ?? []).filter((c) => c.show_in_home))
+
 const displayedCategories = computed<CategoryGroup[]>(() => {
-  let filtered = articles.value ?? []
+  let filtered = (articles.value ?? []).filter((a) => a.category?.show_in_home)
 
   if (selectedCategories.value.length > 0) {
     filtered = filtered.filter((a) => selectedCategories.value.includes(a.category_id!))
@@ -97,7 +99,7 @@ useHead({
           </div>
           <div class="filter-chips">
             <button
-              v-for="cat in categories"
+              v-for="cat in homeCategories"
               :key="cat.id"
               class="cat-btn"
               :class="{ 'cat-btn--active': selectedCategories.includes(cat.id) }"
@@ -156,15 +158,14 @@ useHead({
 <style scoped>
 .page-root {
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #2d6a4f, #1b4332, #8b6f47);
-  background-attachment: fixed;
+  background: #f0ebe0;
   font-family: 'Inter', sans-serif;
-  color: #f5f1e6;
+  color: #1a1a1a;
 }
 
 .hero {
-  position: relative;
   padding: 80px 40px;
+  background: #1b4332;
   text-align: center;
   color: #f5f1e6;
 }
@@ -186,7 +187,7 @@ useHead({
   font-size: 18px;
   font-weight: 400;
   margin: 0;
-  opacity: 0.95;
+  opacity: 0.85;
   line-height: 1.6;
 }
 
@@ -212,7 +213,7 @@ useHead({
 }
 
 .filter-label {
-  color: #f5f1e6;
+  color: #1b4332;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -235,91 +236,94 @@ useHead({
 .clear-btn {
   padding: 8px 16px;
   background: transparent;
-  border: 1px solid rgba(245, 241, 230, 0.6);
+  border: 1px solid rgba(27, 67, 50, 0.3);
   border-radius: 20px;
-  color: #f5f1e6;
+  color: #1b4332;
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;
 }
 .clear-btn:hover {
-  background: rgba(245, 241, 230, 0.1);
+  background: rgba(27, 67, 50, 0.06);
 }
 
 .cat-btn {
   padding: 8px 16px;
   background: transparent;
-  border: 1px solid rgba(245, 241, 230, 0.5);
+  border: 1px solid rgba(27, 67, 50, 0.25);
   border-radius: 20px;
-  color: #f5f1e6;
+  color: #1b4332;
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-weight: 400;
   font-family: 'Inter', sans-serif;
 }
 .cat-btn:hover:not(.cat-btn--active) {
   border-color: #d4845c;
-  background: rgba(212, 132, 92, 0.15);
+  color: #d4845c;
+  background: rgba(212, 132, 92, 0.08);
 }
 .cat-btn--active {
-  background: #d4845c;
-  border-color: #d4845c;
+  background: #1b4332;
+  border-color: #1b4332;
+  color: #f5f1e6;
   font-weight: 600;
 }
 
 .state-btn {
   padding: 6px 12px;
   background: transparent;
-  border: 1px solid rgba(245, 241, 230, 0.4);
+  border: 1px solid rgba(139, 111, 71, 0.35);
   border-radius: 16px;
-  color: #f5f1e6;
+  color: #8b6f47;
   font-size: 11px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-weight: 400;
   font-family: 'Inter', sans-serif;
 }
 .state-btn:hover:not(.state-btn--active) {
   border-color: #8b6f47;
-  background: rgba(139, 111, 71, 0.15);
+  background: rgba(139, 111, 71, 0.08);
 }
 .state-btn--active {
   background: #8b6f47;
   border-color: #8b6f47;
+  color: #f5f1e6;
   font-weight: 600;
 }
 
 .category-group {
-  margin-bottom: 80px;
+  margin-bottom: 72px;
 }
 
 .category-header {
   margin-bottom: 32px;
-  padding-bottom: 20px;
+  padding-bottom: 16px;
   border-bottom: 2px solid rgba(212, 132, 92, 0.3);
 }
 
 .category-title {
   font-family: 'Merriweather', serif;
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 700;
   margin: 0;
-  color: #f5f1e6;
+  color: #1b4332;
   text-transform: capitalize;
 }
 
 .category-count {
   font-size: 13px;
-  color: rgba(245, 241, 230, 0.8);
-  margin: 8px 0 0 0;
+  color: #8b6f47;
+  margin: 6px 0 0 0;
 }
 
 .articles-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 32px;
+  gap: 24px;
 }
 
 .empty-state {
@@ -330,16 +334,49 @@ useHead({
 .empty-state-text {
   font-size: 18px;
   margin: 0;
+  color: #8b6f47;
 }
 
 .footer {
-  padding: 60px 40px 40px;
-  border-top: 1px solid rgba(245, 241, 230, 0.1);
+  padding: 48px 40px 40px;
+  background: #1b4332;
   text-align: center;
   font-size: 14px;
+  color: rgba(245, 241, 230, 0.65);
 }
 
 .footer-text {
   margin: 0;
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 48px 16px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+
+  .content {
+    padding: 32px 16px;
+  }
+
+  .articles-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .empty-state {
+    padding: 48px 16px;
+  }
+
+  .footer {
+    padding: 40px 16px 32px;
+  }
 }
 </style>

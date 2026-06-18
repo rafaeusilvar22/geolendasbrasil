@@ -79,14 +79,15 @@ useHead({
 <style scoped>
 .page-root {
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #2d6a4f, #1b4332, #8b6f47);
-  background-attachment: fixed;
+  background: #f0ebe0;
   font-family: 'Inter', sans-serif;
-  color: #f5f1e6;
+  color: #1a1a1a;
 }
 
 .article-hero {
   padding: 60px 40px 48px;
+  background: #1b4332;
+  color: #f5f1e6;
 }
 
 .hero-inner {
@@ -96,7 +97,7 @@ useHead({
 
 .back-link {
   display: inline-block;
-  color: rgba(245, 241, 230, 0.7);
+  color: rgba(245, 241, 230, 0.65);
   background: none;
   border: none;
   padding: 0;
@@ -121,8 +122,8 @@ useHead({
 .meta-badge {
   display: inline-block;
   padding: 5px 12px;
-  background: rgba(245, 241, 230, 0.15);
-  border: 1px solid rgba(245, 241, 230, 0.25);
+  background: rgba(245, 241, 230, 0.12);
+  border: 1px solid rgba(245, 241, 230, 0.2);
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
@@ -132,8 +133,8 @@ useHead({
 }
 
 .meta-badge--type {
-  background: rgba(212, 132, 92, 0.2);
-  border-color: rgba(212, 132, 92, 0.4);
+  background: rgba(212, 132, 92, 0.25);
+  border-color: rgba(212, 132, 92, 0.45);
   color: #e8a87c;
 }
 
@@ -148,15 +149,16 @@ useHead({
 
 .article-date {
   font-size: 14px;
-  color: rgba(245, 241, 230, 0.6);
+  color: rgba(245, 241, 230, 0.55);
   margin: 0;
 }
 
 .article-body {
-  background: #f5f1e6;
+  background: #fff;
   border-radius: 16px 16px 0 0;
   padding: 56px 40px 80px;
   min-height: 60vh;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06);
 }
 
 .article-excerpt {
