@@ -28,7 +28,19 @@ const { data: articles } = await useAsyncData<Article[]>(`articles-${slug}`, asy
   return data ?? []
 })
 
-useHead({ title: `${category.value?.name} — GeoLendas Brasil` })
+const SITE_URL = 'https://geolendasbrasil.netlify.app'
+const canonicalUrl = `${SITE_URL}/${slug}`
+useSeoMeta({
+  title: `${category.value!.name} — GeoLendas Brasil`,
+  description: category.value!.description ?? `Explore ${category.value!.name.toLowerCase()} dos estados brasileiros: histórias, tradições e cultura.`,
+  ogTitle: `${category.value!.name} — GeoLendas Brasil`,
+  ogDescription: category.value!.description ?? `Explore ${category.value!.name.toLowerCase()} dos estados brasileiros.`,
+  ogUrl: canonicalUrl,
+  ogType: 'website',
+  ogImage: `${SITE_URL}/icon-512x512.png`,
+  twitterCard: 'summary',
+})
+useHead({ link: [{ rel: 'canonical', href: canonicalUrl }] })
 </script>
 
 <template>

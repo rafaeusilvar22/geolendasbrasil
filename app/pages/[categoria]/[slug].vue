@@ -37,7 +37,41 @@ const formattedDate = computed(() =>
   }),
 )
 
-useHead({ title: `${article.value?.title} — GeoLendas Brasil` })
+const SITE_URL = 'https://geolendasbrasil.netlify.app'
+const canonicalUrl = `${SITE_URL}/${catSlug}/${artSlug}`
+useSeoMeta({
+  title: `${article.value!.title} — GeoLendas Brasil`,
+  description: article.value!.excerpt,
+  ogTitle: article.value!.title,
+  ogDescription: article.value!.excerpt,
+  ogUrl: canonicalUrl,
+  ogType: 'article',
+  ogImage: `${SITE_URL}/icon-512x512.png`,
+  articlePublishedTime: article.value!.created_at,
+  articleModifiedTime: article.value!.updated_at,
+  twitterCard: 'summary',
+})
+useHead({
+  link: [{ rel: 'canonical', href: canonicalUrl }],
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: article.value!.title,
+      description: article.value!.excerpt,
+      datePublished: article.value!.created_at,
+      dateModified: article.value!.updated_at,
+      url: canonicalUrl,
+      inLanguage: 'pt-BR',
+      publisher: {
+        '@type': 'Organization',
+        name: 'GeoLendas Brasil',
+        url: SITE_URL,
+      },
+    }),
+  }],
+})
 </script>
 
 <template>

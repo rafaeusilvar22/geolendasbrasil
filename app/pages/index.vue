@@ -73,7 +73,18 @@ function clearFilters() {
   selectedStates.value = []
 }
 
-useHead({ title: 'GeoLendas Brasil' })
+const SITE_URL = 'https://geolendasbrasil.netlify.app'
+useSeoMeta({
+  title: 'GeoLendas Brasil',
+  description: 'Histórias, lendas, tradições e geografia que moldaram cada estado do Brasil. Explore a magia ancestral das nossas terras.',
+  ogTitle: 'GeoLendas Brasil',
+  ogDescription: 'Histórias, lendas, tradições e geografia que moldaram cada estado do Brasil.',
+  ogUrl: `${SITE_URL}/`,
+  ogType: 'website',
+  ogImage: `${SITE_URL}/icon-512x512.png`,
+  twitterCard: 'summary',
+})
+useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/` }] })
 </script>
 
 <template>
