@@ -36,6 +36,7 @@ function getStateClass(id: string) {
 }
 
 function handleClick(id: string) {
+  onLeave()
   if (!hasArticles(id)) return
   const name = getName(id)
   emit('select', props.selectedState === name ? null : name)
