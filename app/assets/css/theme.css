@@ -37,6 +37,8 @@
   --pg-strong: #1b4332;
   --pg-blockquote-bg: rgba(212, 132, 92, 0.06);
   --pg-blockquote-text: #3d2817;
+  --pg-map-empty: #c8b89a;
+  --pg-map-active: #52b788;
 }
 
 /* Dark — forest */
@@ -77,4 +79,6 @@
   --pg-strong: #74c69d;
   --pg-blockquote-bg: rgba(116, 198, 157, 0.06);
   --pg-blockquote-text: #9abf9a;
+  --pg-map-empty: #1c2a1c;
+  --pg-map-active: #2d6a4f;
 }

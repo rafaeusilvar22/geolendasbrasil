@@ -5,6 +5,7 @@ const router = useRouter()
 
 const links = computed(() => [
   { label: 'Início', to: '/' },
+  { label: 'Mapa', to: '/mapa' },
   ...(categories.value ?? []).filter((c) => c.show_in_nav).map((c) => ({ label: c.name, to: `/${c.slug}` })),
 ])
 
