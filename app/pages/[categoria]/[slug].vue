@@ -29,6 +29,21 @@ if (!article.value) {
   throw createError({ statusCode: 404, statusMessage: 'Artigo não encontrado' })
 }
 
+const { data: relatedArticles } = await useAsyncData<Article[]>(
+  `related-${catSlug}-${artSlug}`,
+  async () => {
+    const { data } = await client
+      .from('articles')
+      .select('*, category:categories(id,name,slug,gradient)')
+      .eq('published', true)
+      .eq('category_id', article.value!.category_id)
+      .neq('id', article.value!.id)
+      .order('created_at', { ascending: false })
+      .limit(3)
+    return data ?? []
+  },
+)
+
 const formattedDate = computed(() =>
   new Date(article.value!.created_at).toLocaleDateString('pt-BR', {
     day: '2-digit',
@@ -122,6 +137,13 @@ useHead({
       <div class="article-excerpt">{{ article!.excerpt }}</div>
 
       <div v-if="article!.content" class="article-content" v-html="article!.content" />
+
+      <section v-if="relatedArticles?.length" class="related-section">
+        <h2 class="related-title">Leia também</h2>
+        <div class="related-grid">
+          <ArticleCard v-for="rel in relatedArticles" :key="rel.id" :article="rel" />
+        </div>
+      </section>
 
       <div class="article-footer">
         <button class="footer-back" @click="goBack">
@@ -393,6 +415,33 @@ useHead({
 
 [data-theme="forest"] .share-btn img[alt="X"] {
   filter: invert(1);
+}
+
+.related-section {
+  max-width: 800px;
+  margin: 56px auto 0;
+  padding-top: 40px;
+  border-top: 2px solid var(--pg-section-border);
+}
+
+.related-title {
+  font-family: 'Merriweather', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--pg-h2);
+  margin: 0 0 28px 0;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .related-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
