@@ -283,14 +283,14 @@ async function handleSubmit() {
 
 .back-btn {
   font-size: 13px;
-  color: #8b6f47;
+  color: var(--adm-text-muted);
   text-decoration: none;
   font-family: 'Inter', sans-serif;
   font-weight: 500;
   white-space: nowrap;
 }
 .back-btn:hover {
-  color: #3d2817;
+  color: var(--adm-label);
   text-decoration: underline;
 }
 
@@ -298,13 +298,13 @@ async function handleSubmit() {
   font-family: 'Merriweather', serif;
   font-size: 24px;
   font-weight: 700;
-  color: #1b4332;
+  color: var(--adm-heading);
   margin: 0;
 }
 
 .btn-save {
   padding: 10px 24px;
-  background: #2d6a4f;
+  background: var(--adm-accent);
   color: #f5f1e6;
   border: none;
   border-radius: 8px;
@@ -317,7 +317,7 @@ async function handleSubmit() {
   flex-shrink: 0;
 }
 .btn-save:hover:not(:disabled) {
-  background: #1b4332;
+  background: var(--adm-accent-hover);
 }
 .btn-save:disabled {
   opacity: 0.7;
@@ -355,7 +355,7 @@ async function handleSubmit() {
 }
 
 .sidebar-card {
-  background: #fff;
+  background: var(--adm-surface);
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -368,10 +368,10 @@ async function handleSubmit() {
   font-family: 'Merriweather', serif;
   font-size: 14px;
   font-weight: 700;
-  color: #1b4332;
+  color: var(--adm-heading);
   margin: 0;
   padding-bottom: 12px;
-  border-bottom: 1px solid #e8e0d4;
+  border-bottom: 1px solid var(--adm-row-divider);
 }
 
 .field {
@@ -390,15 +390,15 @@ async function handleSubmit() {
 .field-label {
   font-size: 13px;
   font-weight: 600;
-  color: #3d2817;
+  color: var(--adm-label);
   font-family: 'Inter', sans-serif;
 }
 
 .btn-ai {
   padding: 4px 12px;
   background: transparent;
-  color: #2d6a4f;
-  border: 1.5px solid #2d6a4f;
+  color: var(--adm-accent);
+  border: 1.5px solid var(--adm-accent);
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
@@ -408,7 +408,7 @@ async function handleSubmit() {
   white-space: nowrap;
 }
 .btn-ai:hover:not(:disabled) {
-  background: #2d6a4f;
+  background: var(--adm-accent);
   color: #f5f1e6;
 }
 .btn-ai:disabled {
@@ -425,23 +425,23 @@ async function handleSubmit() {
 
 .field-hint {
   font-size: 12px;
-  color: #999;
+  color: var(--adm-text-faint);
   font-family: 'Inter', sans-serif;
 }
 
 .field-input {
   padding: 10px 14px;
-  border: 1.5px solid #d9cfc1;
+  border: 1.5px solid var(--adm-border);
   border-radius: 8px;
   font-size: 14px;
   font-family: 'Inter', sans-serif;
-  color: #1a1a1a;
-  background: #fff;
+  color: var(--adm-text);
+  background: var(--adm-input-bg);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   outline: none;
 }
 .field-input:focus {
-  border-color: #2d6a4f;
+  border-color: var(--adm-accent);
   box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
 }
 .field-textarea {
@@ -459,14 +459,14 @@ async function handleSubmit() {
 .toggle-input {
   width: 18px;
   height: 18px;
-  accent-color: #2d6a4f;
+  accent-color: var(--adm-accent);
   cursor: pointer;
 }
 
 .toggle-text {
   font-size: 13px;
   font-weight: 600;
-  color: #3d2817;
+  color: var(--adm-label);
   font-family: 'Inter', sans-serif;
 }
 

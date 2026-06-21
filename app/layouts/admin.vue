@@ -2,6 +2,7 @@
 const client = useSupabaseClient()
 const user = useSupabaseUser()
 const drawerCheckbox = ref<HTMLInputElement>()
+const { theme, toggle: toggleTheme } = useTheme()
 
 useRouter().afterEach(() => {
   if (drawerCheckbox.value) drawerCheckbox.value.checked = false
@@ -14,7 +15,7 @@ async function handleLogout() {
 </script>
 
 <template>
-  <div class="drawer" data-theme="discovery">
+  <div class="drawer">
     <input id="admin-drawer" ref="drawerCheckbox" type="checkbox" class="drawer-toggle" />
 
     <div class="drawer-content admin-layout">
@@ -28,6 +29,13 @@ async function handleLogout() {
 
         <div class="admin-user">
           <span class="admin-email">{{ user?.email }}</span>
+          <button
+            class="theme-btn"
+            :aria-label="theme === 'discovery' ? 'Ativar modo escuro' : 'Ativar modo claro'"
+            @click="toggleTheme"
+          >
+            <Icon :name="theme === 'discovery' ? 'heroicons:moon' : 'heroicons:sun'" class="theme-icon" />
+          </button>
           <button class="logout-btn" @click="handleLogout">Sair</button>
         </div>
       </header>
@@ -77,7 +85,7 @@ async function handleLogout() {
 <style scoped>
 .admin-layout {
   min-height: 100vh;
-  background: #f0ebe0;
+  background: var(--adm-bg);
   font-family: 'Inter', sans-serif;
 }
 
@@ -88,7 +96,7 @@ async function handleLogout() {
   justify-content: space-between;
   padding: 0 24px 0 8px;
   height: 64px;
-  background: #1b4332;
+  background: var(--adm-nav-bg);
   border-bottom: 1px solid rgba(245, 241, 230, 0.1);
   position: sticky;
   top: 0;
@@ -123,12 +131,33 @@ async function handleLogout() {
 .admin-user {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .admin-email {
   font-size: 13px;
   color: rgba(245, 241, 230, 0.65);
+}
+
+.theme-btn {
+  background: transparent;
+  border: none;
+  color: rgba(245, 241, 230, 0.7);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.theme-btn:hover {
+  background: rgba(245, 241, 230, 0.1);
+  color: #f5f1e6;
+}
+
+.theme-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .logout-btn {
@@ -156,7 +185,7 @@ async function handleLogout() {
 .admin-sidebar {
   width: 260px;
   min-height: 100vh;
-  background: #1b4332;
+  background: var(--adm-nav-bg);
   display: flex;
   flex-direction: column;
 }

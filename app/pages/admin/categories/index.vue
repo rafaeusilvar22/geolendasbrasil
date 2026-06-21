@@ -250,13 +250,13 @@ async function deleteCategory(cat: Category) {
   font-family: 'Merriweather', serif;
   font-size: 24px;
   font-weight: 700;
-  color: #1b4332;
+  color: var(--adm-heading);
   margin: 0;
 }
 
 .btn-new {
   padding: 10px 20px;
-  background: #2d6a4f;
+  background: var(--adm-accent);
   color: #f5f1e6;
   border: none;
   border-radius: 8px;
@@ -267,12 +267,12 @@ async function deleteCategory(cat: Category) {
   transition: background 0.2s ease;
 }
 .btn-new:hover {
-  background: #1b4332;
+  background: var(--adm-accent-hover);
 }
 
 /* TABLE (desktop) */
 .table-wrapper {
-  background: #fff;
+  background: var(--adm-surface);
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   overflow: hidden;
@@ -286,7 +286,7 @@ async function deleteCategory(cat: Category) {
 }
 
 .table thead tr {
-  background: #f5f1e6;
+  background: var(--adm-surface-alt);
 }
 
 .table th {
@@ -296,20 +296,20 @@ async function deleteCategory(cat: Category) {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #8b6f47;
+  color: var(--adm-text-muted);
 }
 
 .table-row {
-  border-top: 1px solid #f0ebe0;
+  border-top: 1px solid var(--adm-row-divider);
   transition: background 0.15s ease;
 }
 .table-row:hover {
-  background: #faf8f4;
+  background: var(--adm-row-hover);
 }
 
 .table td {
   padding: 14px 16px;
-  color: #1a1a1a;
+  color: var(--adm-text);
   vertical-align: middle;
 }
 
@@ -329,18 +329,18 @@ async function deleteCategory(cat: Category) {
 }
 
 .td-slug {
-  color: #8b6f47;
+  color: var(--adm-text-muted);
   font-family: monospace;
   font-size: 13px;
 }
 
 .td-desc {
-  color: #666;
+  color: var(--adm-text-secondary);
   max-width: 280px;
 }
 
 .td-order {
-  color: #999;
+  color: var(--adm-text-faint);
   text-align: center;
 }
 
@@ -351,14 +351,14 @@ async function deleteCategory(cat: Category) {
 
 .td-empty {
   text-align: center;
-  color: #999;
+  color: var(--adm-text-faint);
   padding: 40px;
 }
 
 .action-edit {
   background: none;
   border: none;
-  color: #2d6a4f;
+  color: var(--adm-accent);
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
@@ -391,14 +391,14 @@ async function deleteCategory(cat: Category) {
 
 .card-empty {
   text-align: center;
-  color: #999;
+  color: var(--adm-text-faint);
   font-size: 14px;
   padding: 40px 0;
   font-family: 'Inter', sans-serif;
 }
 
 .card {
-  background: #fff;
+  background: var(--adm-surface);
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   padding: 16px;
@@ -417,27 +417,27 @@ async function deleteCategory(cat: Category) {
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--adm-text);
   flex: 1;
 }
 
 .card-order {
   font-family: 'Inter', sans-serif;
   font-size: 12px;
-  color: #999;
+  color: var(--adm-text-faint);
   white-space: nowrap;
 }
 
 .card-slug {
   font-family: monospace;
   font-size: 13px;
-  color: #8b6f47;
+  color: var(--adm-text-muted);
 }
 
 .card-desc {
   font-family: 'Inter', sans-serif;
   font-size: 13px;
-  color: #666;
+  color: var(--adm-text-secondary);
   line-height: 1.4;
 }
 
@@ -445,12 +445,12 @@ async function deleteCategory(cat: Category) {
   display: flex;
   gap: 16px;
   padding-top: 8px;
-  border-top: 1px solid #f0ebe0;
+  border-top: 1px solid var(--adm-row-divider);
 }
 
 /* MODAL */
 .modal-box {
-  background: #fff;
+  background: var(--adm-surface);
   border-radius: 12px;
   padding: 32px;
   width: 100%;
@@ -462,7 +462,7 @@ async function deleteCategory(cat: Category) {
   font-family: 'Merriweather', serif;
   font-size: 20px;
   font-weight: 700;
-  color: #1b4332;
+  color: var(--adm-heading);
   margin: 0 0 24px 0;
 }
 
@@ -481,35 +481,35 @@ async function deleteCategory(cat: Category) {
 .field-label {
   font-size: 13px;
   font-weight: 600;
-  color: #3d2817;
+  color: var(--adm-label);
   font-family: 'Inter', sans-serif;
 }
 
 .field-sublabel {
   font-size: 12px;
-  color: #8b6f47;
+  color: var(--adm-text-muted);
   font-family: 'Inter', sans-serif;
 }
 
 .field-hint {
   font-size: 12px;
-  color: #999;
+  color: var(--adm-text-faint);
   font-family: 'Inter', sans-serif;
 }
 
 .field-input {
   padding: 10px 14px;
-  border: 1.5px solid #d9cfc1;
+  border: 1.5px solid var(--adm-border);
   border-radius: 8px;
   font-size: 14px;
   font-family: 'Inter', sans-serif;
-  color: #1a1a1a;
-  background: #fff;
+  color: var(--adm-text);
+  background: var(--adm-input-bg);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   outline: none;
 }
 .field-input:focus {
-  border-color: #2d6a4f;
+  border-color: var(--adm-accent);
   box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
 }
 .field-textarea {
@@ -539,7 +539,7 @@ async function deleteCategory(cat: Category) {
   border-radius: 8px;
   background: linear-gradient(135deg, var(--from), var(--to));
   flex-shrink: 0;
-  border: 1px solid #d9cfc1;
+  border: 1px solid var(--adm-border);
 }
 
 .error-msg {
@@ -563,9 +563,9 @@ async function deleteCategory(cat: Category) {
 .btn-cancel {
   padding: 10px 20px;
   background: transparent;
-  border: 1.5px solid #d9cfc1;
+  border: 1.5px solid var(--adm-border);
   border-radius: 8px;
-  color: #666;
+  color: var(--adm-cancel-text);
   font-size: 14px;
   font-weight: 500;
   font-family: 'Inter', sans-serif;
@@ -573,13 +573,13 @@ async function deleteCategory(cat: Category) {
   transition: all 0.2s ease;
 }
 .btn-cancel:hover {
-  border-color: #8b6f47;
-  color: #3d2817;
+  border-color: var(--adm-text-muted);
+  color: var(--adm-label);
 }
 
 .btn-save {
   padding: 10px 24px;
-  background: #2d6a4f;
+  background: var(--adm-accent);
   color: #f5f1e6;
   border: none;
   border-radius: 8px;
@@ -590,7 +590,7 @@ async function deleteCategory(cat: Category) {
   transition: background 0.2s ease;
 }
 .btn-save:hover:not(:disabled) {
-  background: #1b4332;
+  background: var(--adm-accent-hover);
 }
 .btn-save:disabled {
   opacity: 0.7;

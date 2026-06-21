@@ -128,19 +128,19 @@ useHead({ title: 'Navegação — Admin' })
   font-family: 'Merriweather', serif;
   font-size: 24px;
   font-weight: 700;
-  color: #1b4332;
+  color: var(--adm-heading);
   margin: 0 0 6px 0;
 }
 
 .page-desc {
   font-size: 14px;
-  color: #8b6f47;
+  color: var(--adm-text-muted);
   margin: 0;
   font-family: 'Inter', sans-serif;
 }
 
 .table-wrapper {
-  background: #fff;
+  background: var(--adm-surface);
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   overflow: hidden;
@@ -154,7 +154,7 @@ useHead({ title: 'Navegação — Admin' })
 }
 
 .table thead tr {
-  background: #f5f1e6;
+  background: var(--adm-surface-alt);
 }
 
 .table th {
@@ -164,7 +164,7 @@ useHead({ title: 'Navegação — Admin' })
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #8b6f47;
+  color: var(--adm-text-muted);
 }
 
 .th-center {
@@ -173,11 +173,11 @@ useHead({ title: 'Navegação — Admin' })
 }
 
 .table-row {
-  border-top: 1px solid #f0ebe0;
+  border-top: 1px solid var(--adm-row-divider);
   transition: background 0.15s ease;
 }
 .table-row:hover {
-  background: #faf8f4;
+  background: var(--adm-row-hover);
 }
 
 .table td {
@@ -190,7 +190,7 @@ useHead({ title: 'Navegação — Admin' })
   align-items: center;
   gap: 10px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--adm-text);
 }
 
 .gradient-dot {
@@ -208,7 +208,7 @@ useHead({ title: 'Navegação — Admin' })
 
 .td-empty {
   text-align: center;
-  color: #999;
+  color: var(--adm-text-faint);
   padding: 40px;
 }
 
@@ -228,11 +228,11 @@ useHead({ title: 'Navegação — Admin' })
 }
 
 .sw--on {
-  background: #2d6a4f;
+  background: var(--adm-accent);
 }
 
 .sw--off {
-  background: #d9cfc1;
+  background: var(--adm-sw-off);
 }
 
 .sw-thumb {
@@ -261,14 +261,14 @@ useHead({ title: 'Navegação — Admin' })
 
 .card-empty {
   text-align: center;
-  color: #999;
+  color: var(--adm-text-faint);
   font-size: 14px;
   padding: 40px 0;
   font-family: 'Inter', sans-serif;
 }
 
 .card {
-  background: #fff;
+  background: var(--adm-surface);
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   padding: 16px;
@@ -287,7 +287,7 @@ useHead({ title: 'Navegação — Admin' })
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--adm-text);
 }
 
 .card-toggles {
@@ -295,7 +295,7 @@ useHead({ title: 'Navegação — Admin' })
   flex-direction: column;
   gap: 10px;
   padding-top: 4px;
-  border-top: 1px solid #f0ebe0;
+  border-top: 1px solid var(--adm-row-divider);
 }
 
 .card-toggle-row {
@@ -307,7 +307,7 @@ useHead({ title: 'Navegação — Admin' })
 .card-toggle-label {
   font-family: 'Inter', sans-serif;
   font-size: 13px;
-  color: #555;
+  color: var(--adm-text-secondary);
 }
 
 @media (max-width: 640px) {

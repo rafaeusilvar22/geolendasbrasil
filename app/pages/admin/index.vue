@@ -20,7 +20,7 @@ definePageMeta({ layout: 'admin' })
 }
 
 .dashboard-placeholder {
-  color: #8b6f47;
+  color: var(--adm-text-muted);
   font-size: 15px;
   margin: 0;
 }

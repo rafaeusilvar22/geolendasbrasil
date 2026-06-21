@@ -39,6 +39,26 @@
   --pg-blockquote-text: #3d2817;
   --pg-map-empty: #c8b89a;
   --pg-map-active: #52b788;
+  /* Admin area */
+  --adm-bg: #f0ebe0;
+  --adm-nav-bg: #1b4332;
+  --adm-surface: #ffffff;
+  --adm-surface-alt: #f5f1e6;
+  --adm-border: #d9cfc1;
+  --adm-row-divider: #f0ebe0;
+  --adm-row-hover: #faf8f4;
+  --adm-text: #1a1a1a;
+  --adm-text-muted: #8b6f47;
+  --adm-text-secondary: #666666;
+  --adm-text-faint: #999999;
+  --adm-heading: #1b4332;
+  --adm-label: #3d2817;
+  --adm-accent: #2d6a4f;
+  --adm-accent-hover: #1b4332;
+  --adm-input-bg: #ffffff;
+  --adm-cancel-text: #666666;
+  --adm-sw-off: #d9cfc1;
+  --adm-toolbar-btn-hover: #e8e0d4;
 }
 
 /* Dark — forest */
@@ -81,4 +101,24 @@
   --pg-blockquote-text: #9abf9a;
   --pg-map-empty: #1c2a1c;
   --pg-map-active: #2d6a4f;
+  /* Admin area */
+  --adm-bg: #131e13;
+  --adm-nav-bg: #0a120a;
+  --adm-surface: #172117;
+  --adm-surface-alt: #1c2a1c;
+  --adm-border: rgba(255, 255, 255, 0.1);
+  --adm-row-divider: rgba(255, 255, 255, 0.06);
+  --adm-row-hover: rgba(255, 255, 255, 0.03);
+  --adm-text: #c8dcc8;
+  --adm-text-muted: #6a9e6a;
+  --adm-text-secondary: #7aaa7a;
+  --adm-text-faint: #4a7a4a;
+  --adm-heading: #74c69d;
+  --adm-label: #9abf9a;
+  --adm-accent: #2d6a4f;
+  --adm-accent-hover: #1b4332;
+  --adm-input-bg: #0f1a0f;
+  --adm-cancel-text: #7aaa7a;
+  --adm-sw-off: rgba(255, 255, 255, 0.15);
+  --adm-toolbar-btn-hover: rgba(255, 255, 255, 0.08);
 }

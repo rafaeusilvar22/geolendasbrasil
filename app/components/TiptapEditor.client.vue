@@ -172,14 +172,14 @@ function insertLink() {
 
 <style scoped>
 .editor-wrapper {
-  border: 1.5px solid #d9cfc1;
+  border: 1.5px solid var(--adm-border);
   border-radius: 8px;
   overflow: hidden;
-  background: #fff;
+  background: var(--adm-input-bg);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .editor-wrapper:focus-within {
-  border-color: #2d6a4f;
+  border-color: var(--adm-accent);
   box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
 }
 
@@ -188,8 +188,8 @@ function insertLink() {
   flex-wrap: wrap;
   gap: 2px;
   padding: 8px 10px;
-  background: #f5f1e6;
-  border-bottom: 1px solid #e8e0d4;
+  background: var(--adm-surface-alt);
+  border-bottom: 1px solid var(--adm-border);
 }
 
 .tool-btn {
@@ -200,20 +200,20 @@ function insertLink() {
   font-size: 13px;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
-  color: #3d2817;
+  color: var(--adm-label);
   cursor: pointer;
   transition: all 0.15s ease;
   line-height: 1;
   min-width: 32px;
 }
 .tool-btn:hover:not(:disabled) {
-  background: #e8e0d4;
-  border-color: #d9cfc1;
+  background: var(--adm-toolbar-btn-hover);
+  border-color: var(--adm-border);
 }
 .tool-btn--active {
-  background: #2d6a4f;
+  background: var(--adm-accent);
   color: #f5f1e6;
-  border-color: #2d6a4f;
+  border-color: var(--adm-accent);
 }
 .tool-btn:disabled {
   opacity: 0.35;
@@ -226,7 +226,7 @@ function insertLink() {
 .tool-sep {
   width: 1px;
   height: 24px;
-  background: #d9cfc1;
+  background: var(--adm-border);
   margin: 0 4px;
   align-self: center;
   flex-shrink: 0;
@@ -242,7 +242,7 @@ function insertLink() {
   outline: none;
   font-size: 15px;
   line-height: 1.7;
-  color: #1a1a1a;
+  color: var(--adm-text);
 }
 
 .editor-content :deep(.ProseMirror p) {
@@ -252,7 +252,7 @@ function insertLink() {
   font-family: 'Merriweather', serif;
   font-size: 22px;
   font-weight: 700;
-  color: #1b4332;
+  color: var(--adm-heading);
   margin: 1.5em 0 0.5em 0;
   line-height: 1.3;
 }
@@ -260,7 +260,7 @@ function insertLink() {
   font-family: 'Merriweather', serif;
   font-size: 18px;
   font-weight: 700;
-  color: #2d6a4f;
+  color: var(--adm-accent);
   margin: 1.25em 0 0.4em 0;
   line-height: 1.3;
 }
@@ -276,11 +276,11 @@ function insertLink() {
   border-left: 4px solid #d4845c;
   padding-left: 16px;
   margin: 1em 0;
-  color: #666;
+  color: var(--adm-text-secondary);
   font-style: italic;
 }
 .editor-content :deep(.ProseMirror a) {
-  color: #2d6a4f;
+  color: var(--adm-accent);
   text-decoration: underline;
 }
 .editor-content :deep(.ProseMirror img) {
@@ -293,7 +293,7 @@ function insertLink() {
 .editor-content :deep(.ProseMirror p.is-editor-empty:first-child::before) {
   content: attr(data-placeholder);
   float: left;
-  color: #bbb;
+  color: var(--adm-text-faint);
   pointer-events: none;
   height: 0;
 }
