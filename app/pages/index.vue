@@ -1,37 +1,23 @@
 <script setup lang="ts">
-import type { Article, CategoryGroup, StateItem } from '~/types/article'
-import { HOME_STATES } from '~/constants/states'
+import type { Article, CategoryGroup } from '~/types/article'
 
 const client = useSupabaseClient()
-
-const states = HOME_STATES
-
-const { data: categories } = await useCategories()
 
 const { data: articles } = await useAsyncData<Article[]>('homepage-articles', async () => {
   const { data } = await client
     .from('articles')
-    .select('*, category:categories(*)')
+    .select('id, title, excerpt, content, state, category_id, type, slug, published, created_at, updated_at, category:categories(*)')
     .eq('published', true)
     .order('created_at', { ascending: false })
   return data ?? []
 })
 
-const selectedCategories = ref<number[]>([])
-const selectedStates = ref<string[]>([])
+const PREVIEW_COUNT = 4
 
-const homeCategories = computed(() => (categories.value ?? []).filter((c) => c.show_in_home))
+const expandedCategories = reactive(new Set<number>())
 
-const displayedCategories = computed<CategoryGroup[]>(() => {
-  let filtered = (articles.value ?? []).filter((a) => a.category?.show_in_home)
-
-  if (selectedCategories.value.length > 0) {
-    filtered = filtered.filter((a) => selectedCategories.value.includes(a.category_id!))
-  }
-
-  if (selectedStates.value.length > 0) {
-    filtered = filtered.filter((a) => selectedStates.value.includes(a.state))
-  }
+const allGroups = computed<CategoryGroup[]>(() => {
+  const filtered = (articles.value ?? []).filter((a) => a.category?.show_in_home)
 
   const grouped: Record<number, CategoryGroup> = {}
   filtered.forEach((a) => {
@@ -45,23 +31,6 @@ const displayedCategories = computed<CategoryGroup[]>(() => {
     (a, b) => a.category.sort_order - b.category.sort_order,
   )
 })
-
-function toggleCategory(catId: number) {
-  const idx = selectedCategories.value.indexOf(catId)
-  if (idx >= 0) selectedCategories.value.splice(idx, 1)
-  else selectedCategories.value.push(catId)
-}
-
-function toggleState(stateId: string) {
-  const idx = selectedStates.value.indexOf(stateId)
-  if (idx >= 0) selectedStates.value.splice(idx, 1)
-  else selectedStates.value.push(stateId)
-}
-
-function clearFilters() {
-  selectedCategories.value = []
-  selectedStates.value = []
-}
 
 const SITE_URL = 'https://geolendasbrasil.netlify.app'
 useSeoMeta({
@@ -90,45 +59,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/` }] })
     </div>
 
     <div class="content">
-      <div class="filters">
-        <div>
-          <div class="filter-label-row">
-            <span class="filter-label">Filtrar por categoria:</span>
-            <button class="clear-btn" @click="clearFilters">Limpar filtros</button>
-          </div>
-          <div class="filter-chips">
-            <button
-              v-for="cat in homeCategories"
-              :key="cat.id"
-              class="cat-btn"
-              :class="{ 'cat-btn--active': selectedCategories.includes(cat.id) }"
-              @click="toggleCategory(cat.id)"
-            >
-              {{ cat.name }}
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <span class="filter-label filter-label--block">Por estado:</span>
-          <div class="filter-chips filter-chips--states">
-            <button
-              v-for="state in states"
-              :key="state.id"
-              class="state-btn"
-              :class="{
-                'state-btn--active': selectedStates.includes(state.id),
-                'state-btn--nacional': state.id === 'Nacional',
-              }"
-              @click="toggleState(state.id)"
-            >
-              {{ state.name }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div v-for="group in displayedCategories" :key="group.category.id" class="category-group">
+      <div v-for="group in allGroups" :key="group.category.id" class="category-group">
         <div class="category-header">
           <h2 class="category-title">{{ group.category.name }}</h2>
           <p class="category-count">
@@ -139,14 +70,31 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/` }] })
 
         <div class="articles-grid">
           <ArticleCard
-            v-for="article in group.articles"
+            v-for="article in expandedCategories.has(group.category.id) ? group.articles : group.articles.slice(0, PREVIEW_COUNT)"
             :key="article.id"
             :article="article"
           />
         </div>
+
+        <div v-if="group.articles.length > PREVIEW_COUNT" class="see-more">
+          <button
+            v-if="!expandedCategories.has(group.category.id)"
+            class="see-more-btn"
+            @click="expandedCategories.add(group.category.id)"
+          >
+            Ver mais {{ group.articles.length - PREVIEW_COUNT }} {{ group.articles.length - PREVIEW_COUNT === 1 ? 'artigo' : 'artigos' }}
+          </button>
+          <button
+            v-else
+            class="see-more-btn see-more-btn--collapse"
+            @click="expandedCategories.delete(group.category.id)"
+          >
+            Ver menos
+          </button>
+        </div>
       </div>
 
-      <div v-if="displayedCategories.length === 0" class="empty-state">
+      <div v-if="allGroups.length === 0" class="empty-state">
         <p class="empty-state-text">Nenhum artigo encontrado. Tente ajustar seus filtros.</p>
       </div>
     </div>
@@ -200,111 +148,6 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/` }] })
   margin: 0 auto;
 }
 
-.filters {
-  margin-bottom: 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.filter-label-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.filter-label {
-  color: var(--pg-filter-text);
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.filter-label--block {
-  display: block;
-  margin-bottom: 16px;
-}
-
-.filter-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.filter-chips--states {
-  gap: 6px;
-}
-
-.clear-btn {
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid var(--pg-filter-border);
-  border-radius: 20px;
-  color: var(--pg-filter-text);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: 'Inter', sans-serif;
-}
-.clear-btn:hover {
-  background: var(--pg-badge-bg);
-}
-
-.cat-btn {
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid var(--pg-filter-border);
-  border-radius: 20px;
-  color: var(--pg-filter-text);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 400;
-  font-family: 'Inter', sans-serif;
-}
-.cat-btn:hover:not(.cat-btn--active) {
-  border-color: var(--pg-accent);
-  color: var(--pg-accent);
-  background: rgba(212, 132, 92, 0.08);
-}
-.cat-btn--active {
-  background: var(--pg-filter-active-bg);
-  border-color: var(--pg-filter-active-bg);
-  color: var(--pg-filter-active-text);
-  font-weight: 600;
-}
-
-.state-btn {
-  padding: 6px 12px;
-  background: transparent;
-  border: 1px solid var(--pg-state-border);
-  border-radius: 16px;
-  color: var(--pg-state-text);
-  font-size: 11px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 400;
-  font-family: 'Inter', sans-serif;
-}
-.state-btn:hover:not(.state-btn--active) {
-  background: var(--pg-badge-bg);
-}
-.state-btn--active {
-  background: var(--pg-state-active);
-  border-color: var(--pg-state-active);
-  color: var(--pg-filter-active-text);
-  font-weight: 600;
-}
-
-.state-btn--nacional {
-  border-style: dashed;
-  font-weight: 500;
-}
-.state-btn--nacional.state-btn--active {
-  border-style: solid;
-}
-
 .category-group {
   margin-bottom: 72px;
 }
@@ -334,6 +177,40 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/` }] })
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 24px;
+}
+
+.see-more {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.see-more-btn {
+  padding: 12px 32px;
+  background: transparent;
+  border: 1.5px solid var(--pg-filter-border);
+  border-radius: 24px;
+  color: var(--pg-filter-text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.see-more-btn:hover {
+  background: var(--pg-filter-active-bg);
+  border-color: var(--pg-filter-active-bg);
+  color: var(--pg-filter-active-text);
+}
+.see-more-btn--collapse {
+  font-weight: 400;
+  font-size: 13px;
+  opacity: 0.7;
+}
+.see-more-btn--collapse:hover {
+  background: transparent;
+  border-color: var(--pg-filter-border);
+  color: var(--pg-filter-text);
+  opacity: 1;
 }
 
 .empty-state {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import draggable from 'vuedraggable'
 import type { Category } from '~/types/article'
 
 definePageMeta({ layout: 'admin' })
@@ -6,10 +7,26 @@ definePageMeta({ layout: 'admin' })
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const client = useSupabaseClient<any>()
 
-const { data: categories, refresh } = await useAsyncData<Category[]>('admin-nav-categories', async () => {
+const { data: categoriesData, refresh } = await useAsyncData<Category[]>('admin-nav-categories', async () => {
   const { data } = await client.from('categories').select('*').order('sort_order')
   return data ?? []
 })
+
+const localCategories = ref<Category[]>([])
+watch(categoriesData, (val) => { localCategories.value = [...(val ?? [])] }, { immediate: true })
+
+const reordering = ref(false)
+
+async function handleDragEnd() {
+  reordering.value = true
+  await Promise.all(
+    localCategories.value.map((cat, index) =>
+      client.from('categories').update({ sort_order: index }).eq('id', cat.id),
+    ),
+  )
+  reordering.value = false
+  await refresh()
+}
 
 async function toggle(cat: Category, field: 'show_in_nav' | 'show_in_home') {
   await client.from('categories').update({ [field]: !cat[field] }).eq('id', cat.id)
@@ -28,26 +45,92 @@ useHead({ title: 'Navegação — Admin' })
       </div>
     </div>
 
+    <p v-if="reordering" class="reorder-status">Salvando nova ordem...</p>
+
     <!-- Desktop: tabela -->
     <div class="table-wrapper">
       <table class="table">
         <thead>
           <tr>
+            <th class="th-handle" />
             <th>Categoria</th>
             <th class="th-center">Exibir no menu</th>
             <th class="th-center">Exibir na home</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="cat in categories" :key="cat.id" class="table-row">
-            <td class="td-name">
-              <div
-                class="gradient-dot"
-                :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
-              />
-              {{ cat.name }}
-            </td>
-            <td class="td-toggle">
+        <draggable
+          v-model="localCategories"
+          tag="tbody"
+          item-key="id"
+          handle=".drag-handle"
+          :animation="150"
+          @end="handleDragEnd"
+        >
+          <template #item="{ element: cat }">
+            <tr class="table-row">
+              <td class="td-handle">
+                <Icon name="lucide:grip-vertical" class="drag-handle" />
+              </td>
+              <td class="td-name">
+                <div
+                  class="gradient-dot"
+                  :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
+                />
+                {{ cat.name }}
+              </td>
+              <td class="td-toggle">
+                <button
+                  class="sw"
+                  :class="cat.show_in_nav ? 'sw--on' : 'sw--off'"
+                  :aria-label="`${cat.show_in_nav ? 'Desativar' : 'Ativar'} ${cat.name} no menu`"
+                  @click="toggle(cat, 'show_in_nav')"
+                >
+                  <span class="sw-thumb" />
+                </button>
+              </td>
+              <td class="td-toggle">
+                <button
+                  class="sw"
+                  :class="cat.show_in_home ? 'sw--on' : 'sw--off'"
+                  :aria-label="`${cat.show_in_home ? 'Desativar' : 'Ativar'} ${cat.name} na home`"
+                  @click="toggle(cat, 'show_in_home')"
+                >
+                  <span class="sw-thumb" />
+                </button>
+              </td>
+            </tr>
+          </template>
+          <template #footer>
+            <tr v-if="!localCategories.length">
+              <td colspan="4" class="td-empty">Nenhuma categoria cadastrada.</td>
+            </tr>
+          </template>
+        </draggable>
+      </table>
+    </div>
+
+    <!-- Mobile: cards -->
+    <draggable
+      v-model="localCategories"
+      class="card-list"
+      item-key="id"
+      handle=".drag-handle"
+      :animation="150"
+      @end="handleDragEnd"
+    >
+      <template #item="{ element: cat }">
+        <div class="card">
+          <div class="card-top">
+            <Icon name="lucide:grip-vertical" class="drag-handle" />
+            <div
+              class="gradient-dot"
+              :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
+            />
+            <span class="card-name">{{ cat.name }}</span>
+          </div>
+          <div class="card-toggles">
+            <div class="card-toggle-row">
+              <span class="card-toggle-label">Exibir no menu</span>
               <button
                 class="sw"
                 :class="cat.show_in_nav ? 'sw--on' : 'sw--off'"
@@ -56,8 +139,9 @@ useHead({ title: 'Navegação — Admin' })
               >
                 <span class="sw-thumb" />
               </button>
-            </td>
-            <td class="td-toggle">
+            </div>
+            <div class="card-toggle-row">
+              <span class="card-toggle-label">Exibir na home</span>
               <button
                 class="sw"
                 :class="cat.show_in_home ? 'sw--on' : 'sw--off'"
@@ -66,52 +150,14 @@ useHead({ title: 'Navegação — Admin' })
               >
                 <span class="sw-thumb" />
               </button>
-            </td>
-          </tr>
-          <tr v-if="!categories?.length">
-            <td colspan="3" class="td-empty">Nenhuma categoria cadastrada.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Mobile: cards -->
-    <div class="card-list">
-      <div v-if="!categories?.length" class="card-empty">Nenhuma categoria cadastrada.</div>
-      <div v-for="cat in categories" :key="cat.id" class="card">
-        <div class="card-top">
-          <div
-            class="gradient-dot"
-            :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
-          />
-          <span class="card-name">{{ cat.name }}</span>
-        </div>
-        <div class="card-toggles">
-          <div class="card-toggle-row">
-            <span class="card-toggle-label">Exibir no menu</span>
-            <button
-              class="sw"
-              :class="cat.show_in_nav ? 'sw--on' : 'sw--off'"
-              :aria-label="`${cat.show_in_nav ? 'Desativar' : 'Ativar'} ${cat.name} no menu`"
-              @click="toggle(cat, 'show_in_nav')"
-            >
-              <span class="sw-thumb" />
-            </button>
-          </div>
-          <div class="card-toggle-row">
-            <span class="card-toggle-label">Exibir na home</span>
-            <button
-              class="sw"
-              :class="cat.show_in_home ? 'sw--on' : 'sw--off'"
-              :aria-label="`${cat.show_in_home ? 'Desativar' : 'Ativar'} ${cat.name} na home`"
-              @click="toggle(cat, 'show_in_home')"
-            >
-              <span class="sw-thumb" />
-            </button>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </template>
+      <template #footer>
+        <div v-if="!localCategories.length" class="card-empty">Nenhuma categoria cadastrada.</div>
+      </template>
+    </draggable>
   </div>
 </template>
 
@@ -167,9 +213,41 @@ useHead({ title: 'Navegação — Admin' })
   color: var(--adm-text-muted);
 }
 
+.th-handle {
+  width: 36px;
+}
+
 .th-center {
   text-align: center;
   width: 160px;
+}
+
+.reorder-status {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--adm-text-muted);
+  margin: 0 0 16px 0;
+}
+
+.td-handle {
+  width: 36px;
+  padding-right: 0;
+}
+
+.drag-handle {
+  width: 18px;
+  height: 18px;
+  color: var(--adm-text-faint);
+  cursor: grab;
+  display: block;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.table-row.sortable-chosen {
+  background: var(--adm-row-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .table-row {
@@ -288,6 +366,7 @@ useHead({ title: 'Navegação — Admin' })
   font-size: 15px;
   font-weight: 600;
   color: var(--adm-text);
+  flex: 1;
 }
 
 .card-toggles {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import draggable from 'vuedraggable'
 import type { Category } from '~/types/article'
 
 definePageMeta({ layout: 'admin' })
@@ -6,10 +7,26 @@ definePageMeta({ layout: 'admin' })
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const client = useSupabaseClient<any>()
 
-const { data: categories, refresh } = await useAsyncData<Category[]>('admin-categories', async () => {
+const { data: categoriesData, refresh } = await useAsyncData<Category[]>('admin-categories', async () => {
   const { data } = await client.from('categories').select('*').order('sort_order')
   return data ?? []
 })
+
+const localCategories = ref<Category[]>([])
+watch(categoriesData, (val) => { localCategories.value = [...(val ?? [])] }, { immediate: true })
+
+const reordering = ref(false)
+
+async function handleDragEnd() {
+  reordering.value = true
+  await Promise.all(
+    localCategories.value.map((cat, index) =>
+      client.from('categories').update({ sort_order: index }).eq('id', cat.id),
+    ),
+  )
+  reordering.value = false
+  await refresh()
+}
 
 const modalRef = ref<HTMLDialogElement>()
 const editingId = ref<number | null>(null)
@@ -22,7 +39,6 @@ const form = reactive({
   description: '',
   gradient_from: '2D6A4F',
   gradient_to: 'D4845C',
-  sort_order: 0,
 })
 
 watch(() => form.name, (val) => {
@@ -38,10 +54,7 @@ watch(() => form.name, (val) => {
 function openCreate() {
   editingId.value = null
   error.value = ''
-  Object.assign(form, {
-    name: '', slug: '', description: '',
-    gradient_from: '2D6A4F', gradient_to: 'D4845C', sort_order: categories.value?.length ?? 0,
-  })
+  Object.assign(form, { name: '', slug: '', description: '', gradient_from: '2D6A4F', gradient_to: 'D4845C' })
   modalRef.value?.showModal()
 }
 
@@ -54,7 +67,6 @@ function openEdit(cat: Category) {
     description: cat.description ?? '',
     gradient_from: cat.gradient[0] ?? '2D6A4F',
     gradient_to: cat.gradient[1] ?? 'D4845C',
-    sort_order: cat.sort_order,
   })
   modalRef.value?.showModal()
 }
@@ -77,7 +89,9 @@ async function handleSubmit() {
     slug: form.slug,
     description: form.description || null,
     gradient: [form.gradient_from, form.gradient_to],
-    sort_order: form.sort_order,
+    sort_order: editingId.value
+      ? localCategories.value.find(c => c.id === editingId.value)?.sort_order ?? 0
+      : localCategories.value.length,
   }
 
   let dbError
@@ -114,62 +128,88 @@ async function deleteCategory(cat: Category) {
       <button class="btn-new" @click="openCreate">+ Nova categoria</button>
     </div>
 
+    <p v-if="reordering" class="reorder-status">Salvando nova ordem...</p>
+
     <!-- Desktop: tabela -->
     <div class="table-wrapper">
       <table class="table">
         <thead>
           <tr>
+            <th class="th-handle" />
             <th>Nome</th>
             <th>Slug</th>
             <th>Descrição</th>
-            <th>Ordem</th>
             <th></th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="cat in categories" :key="cat.id" class="table-row">
-            <td class="td-name">
-              <div
-                class="gradient-dot"
-                :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
-              />
-              {{ cat.name }}
-            </td>
-            <td class="td-slug">{{ cat.slug }}</td>
-            <td class="td-desc">{{ cat.description ?? '—' }}</td>
-            <td class="td-order">{{ cat.sort_order }}</td>
-            <td class="td-actions">
-              <button class="action-edit" @click="openEdit(cat)">Editar</button>
-              <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
-            </td>
-          </tr>
-          <tr v-if="!categories?.length">
-            <td colspan="5" class="td-empty">Nenhuma categoria cadastrada.</td>
-          </tr>
-        </tbody>
+        <draggable
+          v-model="localCategories"
+          tag="tbody"
+          item-key="id"
+          handle=".drag-handle"
+          :animation="150"
+          @end="handleDragEnd"
+        >
+          <template #item="{ element: cat }">
+            <tr class="table-row">
+              <td class="td-handle">
+                <Icon name="lucide:grip-vertical" class="drag-handle" />
+              </td>
+              <td class="td-name">
+                <div
+                  class="gradient-dot"
+                  :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
+                />
+                {{ cat.name }}
+              </td>
+              <td class="td-slug">{{ cat.slug }}</td>
+              <td class="td-desc">{{ cat.description ?? '—' }}</td>
+              <td class="td-actions">
+                <button class="action-edit" @click="openEdit(cat)">Editar</button>
+                <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
+              </td>
+            </tr>
+          </template>
+          <template #footer>
+            <tr v-if="!localCategories.length">
+              <td colspan="5" class="td-empty">Nenhuma categoria cadastrada.</td>
+            </tr>
+          </template>
+        </draggable>
       </table>
     </div>
 
     <!-- Mobile: cards -->
-    <div class="card-list">
-      <div v-if="!categories?.length" class="card-empty">Nenhuma categoria cadastrada.</div>
-      <div v-for="cat in categories" :key="cat.id" class="card">
-        <div class="card-top">
-          <div
-            class="gradient-dot"
-            :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
-          />
-          <span class="card-name">{{ cat.name }}</span>
-          <span class="card-order">Ordem {{ cat.sort_order }}</span>
+    <draggable
+      v-model="localCategories"
+      class="card-list"
+      item-key="id"
+      handle=".drag-handle"
+      :animation="150"
+      @end="handleDragEnd"
+    >
+      <template #item="{ element: cat }">
+        <div class="card">
+          <div class="card-top">
+            <Icon name="lucide:grip-vertical" class="drag-handle" />
+            <div
+              class="gradient-dot"
+              :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
+            />
+            <span class="card-name">{{ cat.name }}</span>
+          </div>
+          <div class="card-slug">{{ cat.slug }}</div>
+          <div v-if="cat.description" class="card-desc">{{ cat.description }}</div>
+          <div class="card-actions">
+            <button class="action-edit" @click="openEdit(cat)">Editar</button>
+            <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
+          </div>
         </div>
-        <div class="card-slug">{{ cat.slug }}</div>
-        <div v-if="cat.description" class="card-desc">{{ cat.description }}</div>
-        <div class="card-actions">
-          <button class="action-edit" @click="openEdit(cat)">Editar</button>
-          <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
-        </div>
-      </div>
-    </div>
+      </template>
+      <template #footer>
+        <div v-if="!localCategories.length" class="card-empty">Nenhuma categoria cadastrada.</div>
+      </template>
+    </draggable>
 
     <!-- DaisyUI Modal -->
     <dialog ref="modalRef" class="modal">
@@ -209,11 +249,6 @@ async function deleteCategory(cat: Category) {
                 :style="{ '--from': `#${form.gradient_from}`, '--to': `#${form.gradient_to}` }"
               />
             </div>
-          </div>
-
-          <div class="field">
-            <label class="field-label" for="m-order">Ordem de exibição</label>
-            <input id="m-order" v-model.number="form.sort_order" class="field-input field-input--short" type="number" min="0" />
           </div>
 
           <p v-if="error" class="error-msg">{{ error }}</p>
@@ -328,6 +363,38 @@ async function deleteCategory(cat: Category) {
   flex-shrink: 0;
 }
 
+.th-handle {
+  width: 36px;
+}
+
+.td-handle {
+  width: 36px;
+  padding-right: 0;
+}
+
+.drag-handle {
+  width: 18px;
+  height: 18px;
+  color: var(--adm-text-faint);
+  cursor: grab;
+  display: block;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.table-row.sortable-chosen {
+  background: var(--adm-row-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.reorder-status {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--adm-text-muted);
+  margin: 0 0 16px 0;
+}
+
 .td-slug {
   color: var(--adm-text-muted);
   font-family: monospace;
@@ -337,11 +404,6 @@ async function deleteCategory(cat: Category) {
 .td-desc {
   color: var(--adm-text-secondary);
   max-width: 280px;
-}
-
-.td-order {
-  color: var(--adm-text-faint);
-  text-align: center;
 }
 
 .td-actions {
@@ -419,13 +481,6 @@ async function deleteCategory(cat: Category) {
   font-weight: 600;
   color: var(--adm-text);
   flex: 1;
-}
-
-.card-order {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  color: var(--adm-text-faint);
-  white-space: nowrap;
 }
 
 .card-slug {
