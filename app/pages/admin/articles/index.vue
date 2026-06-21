@@ -1,19 +1,12 @@
 <script setup lang="ts">
 import type { Article, Category } from '~/types/article'
+import { STATES } from '~/constants/states'
 
 definePageMeta({ layout: 'admin' })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const client = useSupabaseClient<any>()
 
-const STATES = [
-  'Acre', 'Alagoas', 'Amapá', 'Amazonas', 'Bahia', 'Ceará',
-  'Distrito Federal', 'Espírito Santo', 'Goiás', 'Maranhão',
-  'Mato Grosso', 'Mato Grosso do Sul', 'Minas Gerais', 'Pará',
-  'Paraíba', 'Paraná', 'Pernambuco', 'Piauí', 'Rio de Janeiro',
-  'Rio Grande do Norte', 'Rio Grande do Sul', 'Rondônia', 'Roraima',
-  'Santa Catarina', 'São Paulo', 'Sergipe', 'Tocantins',
-]
 
 const PAGE_SIZE = 20
 const page = ref(1)

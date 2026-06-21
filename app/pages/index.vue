@@ -1,20 +1,10 @@
 <script setup lang="ts">
 import type { Article, CategoryGroup, StateItem } from '~/types/article'
+import { HOME_STATES } from '~/constants/states'
 
 const client = useSupabaseClient()
 
-const states: StateItem[] = [
-  { id: 'Amazonas', name: 'Amazonas' },
-  { id: 'Pará', name: 'Pará' },
-  { id: 'Mato Grosso', name: 'Mato Grosso' },
-  { id: 'Minas Gerais', name: 'Minas Gerais' },
-  { id: 'São Paulo', name: 'São Paulo' },
-  { id: 'Bahia', name: 'Bahia' },
-  { id: 'Pernambuco', name: 'Pernambuco' },
-  { id: 'Maranhão', name: 'Maranhão' },
-  { id: 'Paraná', name: 'Paraná' },
-  { id: 'Rio Grande do Sul', name: 'Rio Grande do Sul' },
-]
+const states = HOME_STATES
 
 const { data: categories } = await useCategories()
 
@@ -126,7 +116,10 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/` }] })
               v-for="state in states"
               :key="state.id"
               class="state-btn"
-              :class="{ 'state-btn--active': selectedStates.includes(state.id) }"
+              :class="{
+                'state-btn--active': selectedStates.includes(state.id),
+                'state-btn--nacional': state.id === 'Nacional',
+              }"
               @click="toggleState(state.id)"
             >
               {{ state.name }}
@@ -302,6 +295,14 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/` }] })
   border-color: var(--pg-state-active);
   color: var(--pg-filter-active-text);
   font-weight: 600;
+}
+
+.state-btn--nacional {
+  border-style: dashed;
+  font-weight: 500;
+}
+.state-btn--nacional.state-btn--active {
+  border-style: solid;
 }
 
 .category-group {
