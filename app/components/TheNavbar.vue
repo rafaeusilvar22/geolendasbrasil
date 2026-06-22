@@ -1,7 +1,16 @@
 <script setup lang="ts">
+interface Suggestion {
+  id: number
+  title: string
+  slug: string
+  category: { slug: string; name: string } | null
+}
+
 const { data: categories } = await useCategories()
 const { theme, toggle } = useTheme()
 const router = useRouter()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const client = useSupabaseClient<any>()
 
 const links = computed(() => [
   { label: 'Início', to: '/' },
@@ -13,12 +22,54 @@ const menuOpen = ref(false)
 const searchOpen = ref(false)
 const searchQuery = ref('')
 const searchInputRef = ref<HTMLInputElement | null>(null)
+const suggestions = ref<Suggestion[]>([])
+const showSuggestions = ref(false)
+
+let suggestTimeout: ReturnType<typeof setTimeout>
+watch(searchQuery, (val) => {
+  clearTimeout(suggestTimeout)
+  if (val.trim().length < 2) {
+    suggestions.value = []
+    showSuggestions.value = false
+    return
+  }
+  suggestTimeout = setTimeout(async () => {
+    const { data } = await client
+      .from('articles')
+      .select('id, title, slug, category:categories(slug, name)')
+      .eq('published', true)
+      .ilike('title', `%${val.trim()}%`)
+      .limit(5)
+    suggestions.value = (data ?? []) as Suggestion[]
+    showSuggestions.value = suggestions.value.length > 0
+  }, 300)
+})
+
+function selectSuggestion(s: Suggestion) {
+  if (!s.category) return
+  router.push(`/${s.category.slug}/${s.slug}`)
+  closeSuggestions()
+  searchOpen.value = false
+  menuOpen.value = false
+}
+
+function closeSuggestions() {
+  suggestions.value = []
+  showSuggestions.value = false
+  searchQuery.value = ''
+}
+
+function onInputBlur() {
+  setTimeout(() => { showSuggestions.value = false }, 150)
+}
 
 async function toggleSearch() {
   searchOpen.value = !searchOpen.value
   if (searchOpen.value) {
     await nextTick()
     searchInputRef.value?.focus()
+  } else {
+    closeSuggestions()
   }
 }
 
@@ -26,8 +77,8 @@ function submitSearch() {
   const q = searchQuery.value.trim()
   if (!q) return
   searchOpen.value = false
-  searchQuery.value = ''
   menuOpen.value = false
+  closeSuggestions()
   router.push({ path: '/busca', query: { q } })
 }
 </script>
@@ -57,8 +108,20 @@ function submitSearch() {
             placeholder="Buscar artigos..."
             :tabindex="searchOpen ? 0 : -1"
             @keydown.escape="searchOpen = false"
+            @blur="onInputBlur"
           />
         </form>
+        <div v-if="showSuggestions && searchOpen" class="suggestions">
+          <button
+            v-for="s in suggestions"
+            :key="s.id"
+            class="suggestion-item"
+            @mousedown.prevent="selectSuggestion(s)"
+          >
+            <span class="suggestion-title">{{ s.title }}</span>
+            <span v-if="s.category" class="suggestion-cat">{{ s.category.name }}</span>
+          </button>
+        </div>
         <button class="search-toggle" aria-label="Buscar" @click="toggleSearch">
           <Icon :name="searchOpen ? 'heroicons:x-mark' : 'heroicons:magnifying-glass'" class="theme-icon" />
         </button>
@@ -98,16 +161,30 @@ function submitSearch() {
           </NuxtLink>
         </li>
       </ul>
-      <form class="mobile-search-form" @submit.prevent="submitSearch">
-        <input
-          v-model="searchQuery"
-          class="mobile-search-input"
-          placeholder="Buscar artigos..."
-        />
-        <button type="submit" class="mobile-search-btn" aria-label="Buscar">
-          <Icon name="heroicons:magnifying-glass" class="theme-icon" />
-        </button>
-      </form>
+      <div class="mobile-search-wrap">
+        <form class="mobile-search-form" @submit.prevent="submitSearch">
+          <input
+            v-model="searchQuery"
+            class="mobile-search-input"
+            placeholder="Buscar artigos..."
+            @blur="onInputBlur"
+          />
+          <button type="submit" class="mobile-search-btn" aria-label="Buscar">
+            <Icon name="heroicons:magnifying-glass" class="theme-icon" />
+          </button>
+        </form>
+        <div v-if="showSuggestions && menuOpen" class="mobile-suggestions">
+          <button
+            v-for="s in suggestions"
+            :key="s.id"
+            class="suggestion-item"
+            @mousedown.prevent="selectSuggestion(s)"
+          >
+            <span class="suggestion-title">{{ s.title }}</span>
+            <span v-if="s.category" class="suggestion-cat">{{ s.category.name }}</span>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 </template>
@@ -168,6 +245,7 @@ function submitSearch() {
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  position: relative;
 }
 
 .search-form {
@@ -200,6 +278,61 @@ function submitSearch() {
 .search-input:focus {
   background: rgba(245, 241, 230, 0.14);
   border-color: rgba(212, 132, 92, 0.6);
+}
+
+.suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 220px;
+  background: rgba(12, 38, 22, 0.98);
+  border: 1px solid rgba(245, 241, 230, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.suggestion-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(245, 241, 230, 0.07);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+.suggestion-item:first-child {
+  border-top: none;
+}
+.suggestion-item:hover {
+  background: rgba(245, 241, 230, 0.08);
+}
+
+.suggestion-title {
+  display: block;
+  color: #f5f1e6;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestion-cat {
+  display: block;
+  color: #d4845c;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .search-toggle {
@@ -270,7 +403,7 @@ function submitSearch() {
   border-top: 1px solid transparent;
 }
 .mobile-menu--open {
-  max-height: 600px;
+  max-height: 900px;
   border-top-color: rgba(245, 241, 230, 0.08);
 }
 
@@ -298,13 +431,25 @@ function submitSearch() {
   color: #d4845c;
 }
 
+.mobile-search-wrap {
+  border-top: 1px solid rgba(245, 241, 230, 0.08);
+  margin-top: 4px;
+}
+
 .mobile-search-form {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px 12px;
+}
+
+.mobile-suggestions {
   border-top: 1px solid rgba(245, 241, 230, 0.08);
-  margin-top: 4px;
+  padding: 4px 0 8px;
+}
+
+.mobile-suggestions .suggestion-item {
+  padding: 10px 16px;
 }
 
 .mobile-search-input {
