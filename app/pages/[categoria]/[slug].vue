@@ -153,13 +153,13 @@ useHead({
         <div class="share-bar">
           <span class="share-label">Compartilhar</span>
           <a :href="shareLinks.whatsapp" target="_blank" rel="noopener" class="share-btn" title="Compartilhar no WhatsApp">
-            <img src="/icons/share-whatsapp.svg" alt="WhatsApp" width="36" height="36">
+            <NuxtImg src="/icons/share-whatsapp.svg" alt="WhatsApp" width="36" height="36" />
           </a>
           <a :href="shareLinks.twitter" target="_blank" rel="noopener" class="share-btn" title="Compartilhar no X">
-            <img src="/icons/share-twitter.svg" alt="X" width="36" height="36">
+            <NuxtImg src="/icons/share-twitter.svg" alt="X" width="36" height="36" />
           </a>
           <a :href="shareLinks.facebook" target="_blank" rel="noopener" class="share-btn" title="Compartilhar no Facebook">
-            <img src="/icons/share-facebook.svg" alt="Facebook" width="36" height="36">
+            <NuxtImg src="/icons/share-facebook.svg" alt="Facebook" width="36" height="36" />
           </a>
           <button class="share-btn share-btn--copy" :title="copySuccess ? 'Copiado!' : 'Copiar link'" @click="copyLink">
             <svg v-if="!copySuccess" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="17" height="17"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>

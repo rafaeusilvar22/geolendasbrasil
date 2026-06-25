@@ -32,7 +32,16 @@ const articleUrl = computed(() => {
 <template>
   <NuxtLink :to="articleUrl" class="article-card">
     <div class="card-image">
-      <img v-if="coverImage" :src="coverImage" class="card-cover" :alt="article.title" />
+      <NuxtImg
+        v-if="coverImage"
+        :src="coverImage"
+        class="card-cover"
+        :alt="article.title"
+        width="400"
+        height="200"
+        fit="cover"
+        loading="lazy"
+      />
       <div
         v-else
         class="card-gradient"

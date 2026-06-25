@@ -51,6 +51,13 @@ export default defineNuxtConfig({
       ],
     },
   },
+  image: {
+    domains: [
+      process.env.SUPABASE_URL
+        ? new URL(process.env.SUPABASE_URL).hostname
+        : '',
+    ].filter(Boolean),
+  },
   css: ['~/assets/css/theme.css'],
   fonts: {
     families: [
