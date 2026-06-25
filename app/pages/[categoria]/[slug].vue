@@ -36,7 +36,7 @@ const { data: relatedArticles } = await useAsyncData<Article[]>(
       .from('articles')
       .select('*, category:categories(id,name,slug,gradient)')
       .eq('published', true)
-      .eq('category_id', article.value!.category_id)
+      .eq('category_id', article.value!.category_id as number)
       .neq('id', article.value!.id)
       .order('created_at', { ascending: false })
       .limit(3)
@@ -112,6 +112,62 @@ useHead({
     }),
   }],
 })
+
+// --- Immersive reading mode ---
+const isImmersive = ref(false)
+const immersiveScrollRef = ref<HTMLElement | null>(null)
+const readingProgress = ref(0)
+const immersiveFontSize = ref(18)
+
+function enterImmersive() {
+  isImmersive.value = true
+  document.body.style.overflow = 'hidden'
+  nextTick(() => {
+    if (immersiveScrollRef.value) immersiveScrollRef.value.scrollTop = 0
+  })
+}
+
+function exitImmersive() {
+  isImmersive.value = false
+  document.body.style.overflow = ''
+  readingProgress.value = 0
+}
+
+function onImmersiveScroll() {
+  const el = immersiveScrollRef.value
+  if (!el) return
+  const total = el.scrollHeight - el.clientHeight
+  readingProgress.value = total > 0 ? (el.scrollTop / total) * 100 : 0
+}
+
+function increaseFontSize() {
+  if (immersiveFontSize.value < 24) {
+    immersiveFontSize.value++
+    localStorage.setItem('immersive-font-size', String(immersiveFontSize.value))
+  }
+}
+
+function decreaseFontSize() {
+  if (immersiveFontSize.value > 14) {
+    immersiveFontSize.value--
+    localStorage.setItem('immersive-font-size', String(immersiveFontSize.value))
+  }
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && isImmersive.value) exitImmersive()
+}
+
+onMounted(() => {
+  const stored = localStorage.getItem('immersive-font-size')
+  if (stored) immersiveFontSize.value = parseInt(stored)
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+  document.body.style.overflow = ''
+})
 </script>
 
 <template>
@@ -168,6 +224,49 @@ useHead({
         </div>
       </div>
     </div>
+
+    <button class="immersive-trigger" title="Modo de leitura imersiva" @click="enterImmersive">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+      Ler no escuro
+    </button>
+
+    <Teleport to="body">
+      <Transition name="immersive-fade">
+        <div v-if="isImmersive" class="immersive-overlay">
+          <div class="immersive-topbar">
+            <div class="immersive-progress-bar" :style="{ width: readingProgress + '%' }" />
+            <span class="immersive-logo">GeoLendas Brasil</span>
+            <div class="immersive-controls">
+              <button class="immersive-ctrl" title="Diminuir fonte" @click="decreaseFontSize">A−</button>
+              <span class="immersive-font-size">{{ immersiveFontSize }}</span>
+              <button class="immersive-ctrl" title="Aumentar fonte" @click="increaseFontSize">A+</button>
+              <button class="immersive-ctrl immersive-close" title="Fechar (Esc)" @click="exitImmersive">✕</button>
+            </div>
+          </div>
+
+          <div ref="immersiveScrollRef" class="immersive-scroll" @scroll="onImmersiveScroll">
+            <div class="immersive-inner">
+              <div class="immersive-meta">
+                <span v-if="article!.state" class="immersive-badge">{{ article!.state }}</span>
+                <span v-if="article!.type" class="immersive-badge immersive-badge--type">{{ article!.type }}</span>
+              </div>
+              <h1 class="immersive-title">{{ article!.title }}</h1>
+              <p class="immersive-date">{{ formattedDate }}</p>
+              <div class="immersive-excerpt">{{ article!.excerpt }}</div>
+              <div
+                class="immersive-body"
+                :style="{ fontSize: immersiveFontSize + 'px' }"
+                v-html="article!.content"
+              />
+              <div class="immersive-end">
+                <span class="immersive-end-mark">✦ ✦ ✦</span>
+                <button class="immersive-exit-btn" @click="exitImmersive">Fechar modo imersivo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -441,6 +540,309 @@ useHead({
 @media (max-width: 768px) {
   .related-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+.immersive-trigger {
+  position: fixed;
+  bottom: 28px;
+  right: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 18px;
+  background: #1a1208;
+  border: 1px solid rgba(200, 149, 107, 0.4);
+  border-radius: 24px;
+  color: #c8956b;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+.immersive-trigger:hover {
+  background: #221a0c;
+  border-color: rgba(200, 149, 107, 0.7);
+  box-shadow: 0 6px 28px rgba(200, 149, 107, 0.18);
+  transform: translateY(-2px);
+}
+
+/* Immersive overlay transition */
+.immersive-fade-enter-active,
+.immersive-fade-leave-active {
+  transition: opacity 0.35s ease;
+}
+.immersive-fade-enter-from,
+.immersive-fade-leave-to {
+  opacity: 0;
+}
+
+/* Immersive overlay */
+.immersive-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0e0b08;
+  display: flex;
+  flex-direction: column;
+}
+
+.immersive-topbar {
+  flex-shrink: 0;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(14, 11, 8, 0.97);
+  border-bottom: 1px solid rgba(192, 168, 130, 0.08);
+  position: relative;
+}
+
+.immersive-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: #c8956b;
+  transition: width 0.15s linear;
+  border-radius: 0 2px 2px 0;
+}
+
+.immersive-logo {
+  font-family: 'Merriweather', serif;
+  font-size: 13px;
+  color: rgba(192, 168, 130, 0.45);
+  letter-spacing: 0.3px;
+}
+
+.immersive-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.immersive-ctrl {
+  background: transparent;
+  border: 1px solid rgba(192, 168, 130, 0.15);
+  border-radius: 8px;
+  color: rgba(192, 168, 130, 0.6);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+.immersive-ctrl:hover {
+  background: rgba(200, 149, 107, 0.12);
+  border-color: rgba(200, 149, 107, 0.4);
+  color: #c8956b;
+}
+
+.immersive-font-size {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: rgba(192, 168, 130, 0.35);
+  min-width: 22px;
+  text-align: center;
+}
+
+.immersive-close {
+  margin-left: 8px;
+  border-color: rgba(192, 168, 130, 0.2);
+  font-size: 14px;
+  padding: 5px 9px;
+}
+
+.immersive-scroll {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding: 64px 24px 100px;
+}
+.immersive-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.immersive-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.immersive-scroll::-webkit-scrollbar-thumb {
+  background: rgba(200, 149, 107, 0.25);
+  border-radius: 3px;
+}
+.immersive-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(200, 149, 107, 0.45);
+}
+
+.immersive-inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.immersive-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.immersive-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(192, 168, 130, 0.08);
+  border: 1px solid rgba(192, 168, 130, 0.2);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: rgba(192, 168, 130, 0.65);
+}
+.immersive-badge--type {
+  background: rgba(200, 149, 107, 0.1);
+  border-color: rgba(200, 149, 107, 0.3);
+  color: rgba(200, 149, 107, 0.8);
+}
+
+.immersive-title {
+  font-family: 'Merriweather', serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #ede3d4;
+  line-height: 1.25;
+  margin: 0 0 16px 0;
+}
+
+.immersive-date {
+  font-size: 13px;
+  color: rgba(192, 168, 130, 0.4);
+  margin: 0 0 44px 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.immersive-excerpt {
+  font-family: 'Merriweather', serif;
+  font-style: italic;
+  font-size: 19px;
+  color: #d4c0a0;
+  line-height: 1.8;
+  margin-bottom: 44px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid rgba(192, 168, 130, 0.12);
+}
+
+.immersive-body {
+  color: #b8a48a;
+  line-height: 1.95;
+  font-family: 'Merriweather', serif;
+}
+
+.immersive-body :deep(p) {
+  margin: 0 0 1.3em 0;
+}
+.immersive-body :deep(h2) {
+  font-family: 'Merriweather', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #ddd0be;
+  margin: 2.2em 0 0.7em 0;
+  line-height: 1.3;
+}
+.immersive-body :deep(h3) {
+  font-family: 'Merriweather', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #cfc3ae;
+  margin: 1.8em 0 0.5em 0;
+  line-height: 1.3;
+}
+.immersive-body :deep(ul),
+.immersive-body :deep(ol) {
+  padding-left: 1.5em;
+  margin: 0 0 1.3em 0;
+}
+.immersive-body :deep(li) {
+  margin-bottom: 0.45em;
+}
+.immersive-body :deep(blockquote) {
+  border-left: 3px solid #c8956b;
+  padding: 12px 20px;
+  margin: 1.75em 0;
+  background: rgba(200, 149, 107, 0.07);
+  border-radius: 0 8px 8px 0;
+  color: #c4ad8e;
+  font-style: italic;
+}
+.immersive-body :deep(a) {
+  color: #c8956b;
+  text-decoration: underline;
+}
+.immersive-body :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin: 1.75em 0;
+  display: block;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+.immersive-body :deep(strong) {
+  color: #e0d0b8;
+  font-weight: 700;
+}
+
+.immersive-end {
+  margin-top: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.immersive-end-mark {
+  font-size: 14px;
+  color: rgba(200, 149, 107, 0.35);
+  letter-spacing: 8px;
+}
+
+.immersive-exit-btn {
+  background: transparent;
+  border: 1px solid rgba(200, 149, 107, 0.3);
+  border-radius: 24px;
+  color: rgba(200, 149, 107, 0.7);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.immersive-exit-btn:hover {
+  background: rgba(200, 149, 107, 0.1);
+  border-color: rgba(200, 149, 107, 0.6);
+  color: #c8956b;
+}
+
+@media (max-width: 640px) {
+  .immersive-title {
+    font-size: 28px;
+  }
+  .immersive-excerpt {
+    font-size: 16px;
+  }
+  .immersive-scroll {
+    padding: 48px 20px 80px;
+  }
+  .immersive-logo {
+    display: none;
+  }
+  .immersive-trigger {
+    bottom: 20px;
+    right: 16px;
   }
 }
 
