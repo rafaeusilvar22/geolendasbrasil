@@ -22,6 +22,8 @@ export interface Article {
   gradient?: [string, string]
   slug: string
   published: boolean
+  audio_url: string | null
+  has_audio: boolean
   created_at: string
   updated_at: string
 }

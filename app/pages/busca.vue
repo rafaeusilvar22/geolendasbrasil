@@ -14,7 +14,7 @@ const { data: results, pending } = await useAsyncData<Article[]>(
     if (!q.value.trim()) return []
     const { data } = await client
       .from('articles')
-      .select('*, category:categories(*)')
+      .select('id, title, excerpt, content, state, category_id, type, slug, published, has_audio, created_at, updated_at, category:categories(*)')
       .eq('published', true)
       .or(`title.ilike.%${q.value}%,excerpt.ilike.%${q.value}%`)
       .order('created_at', { ascending: false })
