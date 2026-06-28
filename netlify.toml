@@ -11,6 +11,26 @@
   NODE_VERSION = "22"
 
 
+[[redirects]]
+  from = "/folclores"
+  to = "/folclore"
+  status = 301
+
+[[redirects]]
+  from = "/folclores/*"
+  to = "/folclore/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/lendas"
+  to = "/mitos-de-origem"
+  status = 301
+
+[[redirects]]
+  from = "/lendas/*"
+  to = "/mitos-de-origem/:splat"
+  status = 301
+
 [[headers]]
   for = "/sw.js"
   [headers.values]
