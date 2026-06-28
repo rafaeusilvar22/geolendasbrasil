@@ -68,7 +68,7 @@ function seekTo(e: MouseEvent) {
 </script>
 
 <template>
-  <div>
+  <div :class="['layout-root', { 'layout-root--player-open': isOpen && track }]">
     <TheNavbar />
     <slot />
 
@@ -232,5 +232,12 @@ function seekTo(e: MouseEvent) {
 .player-slide-enter-from,
 .player-slide-leave-to {
   transform: translateY(100%);
+}
+
+.layout-root {
+  transition: padding-bottom 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.layout-root--player-open {
+  padding-bottom: 72px;
 }
 </style>
