@@ -28,13 +28,12 @@ async function handleGenerateAudio() {
   generatingAudio.value = true
   audioError.value = ''
   try {
-    const res = await fetch('/.netlify/functions/generate-audio', {
+    const { data, error: fnError } = await client.functions.invoke('generate-audio', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ conteudo: form.content, id: form.slug, tipo: 'artigo' }),
+      body: { conteudo: form.content, id: form.slug, tipo: 'artigo' },
     })
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.error ?? 'Erro ao gerar áudio')
+    if (fnError) throw fnError
+    if (!data?.audioUrl) throw new Error('Resposta inválida da função')
     audioUrl.value = data.audioUrl
     if (props.article) {
       await client.from('articles').update({ audio_url: data.audioUrl }).eq('id', props.article.id)
@@ -51,15 +50,11 @@ async function handleDeleteAudio() {
   deletingAudio.value = true
   audioError.value = ''
   try {
-    const res = await fetch('/.netlify/functions/generate-audio', {
+    const { error: fnError } = await client.functions.invoke('generate-audio', {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ audioUrl: audioUrl.value }),
+      body: { audioUrl: audioUrl.value },
     })
-    if (!res.ok) {
-      const data = await res.json()
-      throw new Error(data.error ?? 'Erro ao excluir áudio')
-    }
+    if (fnError) throw fnError
     audioUrl.value = null
     if (props.article) {
       await client.from('articles').update({ audio_url: null }).eq('id', props.article.id)
