@@ -132,7 +132,12 @@ function submitSearch() {
         :aria-label="theme === 'discovery' ? 'Ativar modo escuro' : 'Ativar modo claro'"
         @click="toggle"
       >
-        <Icon :name="theme === 'discovery' ? 'heroicons:moon' : 'heroicons:sun'" class="theme-icon" />
+        <ClientOnly>
+          <Icon :name="theme === 'discovery' ? 'heroicons:moon' : 'heroicons:sun'" class="theme-icon" />
+          <template #fallback>
+            <Icon name="heroicons:moon" class="theme-icon" />
+          </template>
+        </ClientOnly>
       </button>
 
       <button

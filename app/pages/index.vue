@@ -6,7 +6,7 @@ const client = useSupabaseClient()
 const { data: articles } = await useAsyncData<Article[]>('homepage-articles', async () => {
   const { data } = await client
     .from('articles')
-    .select('id, title, excerpt, content, state, category_id, type, slug, published, created_at, updated_at, category:categories(*)')
+    .select('id, title, excerpt, content, state, category_id, type, slug, published, has_audio, created_at, updated_at, category:categories(*)')
     .eq('published', true)
     .order('created_at', { ascending: false })
   return data ?? []

@@ -21,7 +21,7 @@ if (!category.value) {
 const { data: articles } = await useAsyncData<Article[]>(`articles-${slug}`, async () => {
   const { data } = await client
     .from('articles')
-    .select('*, category:categories(id,name,slug,gradient)')
+    .select('id, title, excerpt, content, state, category_id, type, slug, published, has_audio, created_at, updated_at, category:categories(id,name,slug,gradient)')
     .eq('category_id', category.value!.id)
     .eq('published', true)
     .order('created_at', { ascending: false })

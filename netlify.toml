@@ -2,8 +2,14 @@
   command = "npm run build"
   publish = "dist"
 
+[dev]
+  command = "npm run dev"
+  targetPort = 3000
+  framework = "#custom"
+
 [build.environment]
   NODE_VERSION = "22"
+
 
 [[headers]]
   for = "/sw.js"

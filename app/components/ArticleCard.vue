@@ -41,6 +41,10 @@ const articleUrl = computed(() => {
         <div class="card-texture" />
         <span v-if="article.type" class="card-type-label">{{ article.type }}</span>
       </div>
+      <div v-if="article.has_audio" class="audio-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="9" height="9"><polygon points="5,3 19,12 5,21"/></svg>
+        Áudio
+      </div>
     </div>
 
     <div class="card-content">
@@ -121,6 +125,27 @@ const articleUrl = computed(() => {
   font-size: 13px;
   font-weight: 500;
   font-family: 'Inter', sans-serif;
+}
+
+.audio-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  background: rgba(10, 8, 5, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  color: #f5f1e6;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  pointer-events: none;
 }
 
 .card-content {

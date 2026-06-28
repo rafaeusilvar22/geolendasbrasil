@@ -34,7 +34,7 @@ const { data: relatedArticles } = await useAsyncData<Article[]>(
   async () => {
     const { data } = await client
       .from('articles')
-      .select('*, category:categories(id,name,slug,gradient)')
+      .select('id, title, excerpt, content, state, category_id, type, slug, published, has_audio, created_at, updated_at, category:categories(id,name,slug,gradient)')
       .eq('published', true)
       .eq('category_id', article.value!.category_id as number)
       .neq('id', article.value!.id)
@@ -168,6 +168,18 @@ onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
   document.body.style.overflow = ''
 })
+
+// --- Audio player ---
+const { isOpen: playerOpen, play: playAudio } = useAudioPlayer()
+
+function openPlayer() {
+  if (!article.value?.audio_url) return
+  playAudio({
+    url: article.value.audio_url,
+    title: article.value.title,
+    category: article.value.category?.name,
+  })
+}
 </script>
 
 <template>
@@ -190,7 +202,13 @@ onUnmounted(() => {
     </div>
 
     <div class="article-body">
-      <div class="article-excerpt">{{ article!.excerpt }}</div>
+      <div class="excerpt-wrapper">
+        <button class="immersive-inline-btn" @click="enterImmersive">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          Ler no escuro
+        </button>
+        <div class="article-excerpt">{{ article!.excerpt }}</div>
+      </div>
 
       <div v-if="article!.content" class="article-content" v-html="article!.content" />
 
@@ -225,9 +243,14 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <button class="immersive-trigger" title="Modo de leitura imersiva" @click="enterImmersive">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
-      Ler no escuro
+    <button
+      v-if="article!.audio_url && !playerOpen"
+      class="audio-fab"
+      title="Ouvir narração"
+      @click="openPlayer"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><polygon points="5,3 19,12 5,21"/></svg>
+      Ouvir
     </button>
 
     <Teleport to="body">
@@ -357,8 +380,6 @@ onUnmounted(() => {
 }
 
 .article-excerpt {
-  max-width: 800px;
-  margin: 0 auto 40px;
   font-size: 18px;
   line-height: 1.7;
   color: var(--pg-article-lead);
@@ -543,7 +564,8 @@ onUnmounted(() => {
   }
 }
 
-.immersive-trigger {
+/* FAB "Ouvir" */
+.audio-fab {
   position: fixed;
   bottom: 28px;
   right: 24px;
@@ -551,24 +573,52 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 10px 18px;
-  background: #1a1208;
-  border: 1px solid rgba(200, 149, 107, 0.4);
+  padding: 10px 20px;
+  background: var(--pg-accent, #2D6A4F);
+  border: none;
   border-radius: 24px;
-  color: #c8956b;
+  color: #f5f1e6;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 20px rgba(45, 106, 79, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.immersive-trigger:hover {
-  background: #221a0c;
-  border-color: rgba(200, 149, 107, 0.7);
-  box-shadow: 0 6px 28px rgba(200, 149, 107, 0.18);
+.audio-fab:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(45, 106, 79, 0.55);
 }
+
+/* Wrapper do excerpt + botão imersivo inline */
+.excerpt-wrapper {
+  max-width: 800px;
+  margin: 0 auto 40px;
+}
+
+.immersive-inline-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  margin-bottom: 14px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid rgba(200, 149, 107, 0.25);
+  border-radius: 20px;
+  color: var(--pg-text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+.immersive-inline-btn:hover {
+  border-color: rgba(200, 149, 107, 0.65);
+  color: #c8956b;
+  background: rgba(200, 149, 107, 0.06);
+}
+
 
 /* Immersive overlay transition */
 .immersive-fade-enter-active,
@@ -840,7 +890,7 @@ onUnmounted(() => {
   .immersive-logo {
     display: none;
   }
-  .immersive-trigger {
+  .audio-fab {
     bottom: 20px;
     right: 16px;
   }

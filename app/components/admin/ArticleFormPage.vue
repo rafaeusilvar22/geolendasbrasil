@@ -15,6 +15,57 @@ const error = ref('')
 const aiError = ref('')
 const generatingExcerpt = ref(false)
 
+const audioUrl = ref<string | null>(props.article?.audio_url ?? null)
+const generatingAudio = ref(false)
+const deletingAudio = ref(false)
+const audioError = ref('')
+
+async function handleGenerateAudio() {
+  if (!form.content) {
+    audioError.value = 'Adicione conteúdo ao artigo antes de gerar o áudio.'
+    return
+  }
+  generatingAudio.value = true
+  audioError.value = ''
+  try {
+    const { data, error: fnError } = await client.functions.invoke('generate-audio', {
+      method: 'POST',
+      body: { conteudo: form.content, id: form.slug, tipo: 'artigo' },
+    })
+    if (fnError) throw fnError
+    if (!data?.audioUrl) throw new Error('Resposta inválida da função')
+    audioUrl.value = data.audioUrl
+    if (props.article) {
+      await client.from('articles').update({ audio_url: data.audioUrl }).eq('id', props.article.id)
+    }
+  } catch (err) {
+    audioError.value = err instanceof Error ? err.message : 'Erro desconhecido'
+  } finally {
+    generatingAudio.value = false
+  }
+}
+
+async function handleDeleteAudio() {
+  if (!audioUrl.value) return
+  deletingAudio.value = true
+  audioError.value = ''
+  try {
+    const { error: fnError } = await client.functions.invoke('generate-audio', {
+      method: 'DELETE',
+      body: { audioUrl: audioUrl.value },
+    })
+    if (fnError) throw fnError
+    audioUrl.value = null
+    if (props.article) {
+      await client.from('articles').update({ audio_url: null }).eq('id', props.article.id)
+    }
+  } catch (err) {
+    audioError.value = err instanceof Error ? err.message : 'Erro desconhecido'
+  } finally {
+    deletingAudio.value = false
+  }
+}
+
 async function generateExcerpt() {
   if (!form.title) {
     aiError.value = 'Preencha o título antes de gerar o resumo.'
@@ -79,6 +130,7 @@ watch(
       type: a.type,
       published: a.published,
     })
+    audioUrl.value = a.audio_url ?? null
   },
   { immediate: true },
 )
@@ -248,6 +300,40 @@ async function handleSubmit() {
               {{ form.published ? 'Visível no site' : 'Rascunho' }}
             </span>
           </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h3 class="sidebar-card-title">Narração em áudio</h3>
+
+          <template v-if="mode === 'edit'">
+            <audio v-if="audioUrl" :src="audioUrl" controls class="audio-player" />
+
+            <p v-if="audioError" class="ai-error">{{ audioError }}</p>
+
+            <div class="audio-actions">
+              <button
+                type="button"
+                class="btn-ai"
+                :disabled="generatingAudio || !form.content"
+                @click="handleGenerateAudio"
+              >
+                {{ generatingAudio ? 'Gerando...' : audioUrl ? 'Regenerar áudio' : 'Gerar áudio' }}
+              </button>
+              <button
+                v-if="audioUrl"
+                type="button"
+                class="btn-delete-audio"
+                :disabled="deletingAudio"
+                @click="handleDeleteAudio"
+              >
+                {{ deletingAudio ? 'Excluindo...' : 'Excluir' }}
+              </button>
+            </div>
+
+            <span v-if="!form.content" class="field-hint">Adicione conteúdo ao artigo para habilitar.</span>
+          </template>
+
+          <span v-else class="field-hint">Salve o artigo para poder gerar o áudio.</span>
         </div>
 
       </aside>
@@ -462,6 +548,40 @@ async function handleSubmit() {
   font-weight: 600;
   color: var(--adm-label);
   font-family: 'Inter', sans-serif;
+}
+
+.audio-player {
+  width: 100%;
+  height: 36px;
+  border-radius: 6px;
+}
+
+.audio-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-delete-audio {
+  padding: 4px 12px;
+  background: transparent;
+  color: #c9724a;
+  border: 1.5px solid #c9724a;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+.btn-delete-audio:hover:not(:disabled) {
+  background: #c9724a;
+  color: #fff;
+}
+.btn-delete-audio:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 @media (max-width: 900px) {
