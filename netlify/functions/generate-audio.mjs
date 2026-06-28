@@ -1,28 +1,28 @@
 import { put, del } from '@vercel/blob'
 import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts'
 
-function stripHtml(html: string): string {
+function stripHtml(html) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
-async function generateAudio(text: string): Promise<Buffer> {
+async function generateAudio(text) {
   const tts = new MsEdgeTTS()
   await tts.setMetadata('pt-BR-FranciscaNeural', OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3)
 
   return new Promise((resolve, reject) => {
     const { audioStream } = tts.toStream(text)
-    const chunks: Buffer[] = []
-    audioStream.on('data', (chunk: Buffer) => chunks.push(chunk))
+    const chunks = []
+    audioStream.on('data', (chunk) => chunks.push(chunk))
     audioStream.on('end', () => resolve(Buffer.concat(chunks)))
     audioStream.on('error', reject)
   })
 }
 
-export default async (req: Request) => {
+export default async (req) => {
   console.log(`[generate-audio] method=${req.method}`)
 
   if (req.method === 'DELETE') {
-    let body: { audioUrl?: string }
+    let body
     try { body = await req.json() } catch { body = {} }
 
     if (!body.audioUrl) {
@@ -47,7 +47,7 @@ export default async (req: Request) => {
     return new Response('Method not allowed', { status: 405 })
   }
 
-  let body: { conteudo?: string; id?: string; tipo?: string }
+  let body
   try {
     body = await req.json()
   } catch {

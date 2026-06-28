@@ -16,7 +16,6 @@
 
 [functions."generate-audio"]
   timeout = 30
-  external_node_modules = ["msedge-tts", "bufferutil", "utf-8-validate"]
 
 [[headers]]
   for = "/sw.js"
