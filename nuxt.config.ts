@@ -1,5 +1,34 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  hooks: {
+    async 'nitro:config'(nitroConfig) {
+      if (nitroConfig.dev) return
+
+      const { createClient } = await import('@supabase/supabase-js')
+      const supabase = createClient(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_KEY!,
+      )
+
+      const [{ data: categories }, { data: articles }] = await Promise.all([
+        supabase.from('categories').select('slug'),
+        supabase
+          .from('articles')
+          .select('slug, category:categories!inner(slug)')
+          .eq('published', true),
+      ])
+
+      const routes: string[] = [
+        '/',
+        '/mapa',
+        ...(categories?.map(c => `/${c.slug}`) ?? []),
+        ...(articles?.map(a => `/${(a.category as { slug: string }).slug}/${a.slug}`) ?? []),
+      ]
+
+      nitroConfig.prerender = nitroConfig.prerender ?? {}
+      nitroConfig.prerender.routes = [...(nitroConfig.prerender.routes ?? []), ...routes]
+    },
+  },
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@nuxtjs/supabase', '@nuxtjs/tailwindcss', '@nuxt/fonts', '@nuxt/icon', '@nuxt/image', '@netlify/nuxt', '@vite-pwa/nuxt', 'nuxt-og-image'],
