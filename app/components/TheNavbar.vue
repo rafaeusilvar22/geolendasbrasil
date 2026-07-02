@@ -9,14 +9,32 @@ interface Suggestion {
 const { data: categories } = await useCategories()
 const { theme, toggle } = useTheme()
 const router = useRouter()
+const route = useRoute()
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const client = useSupabaseClient<any>()
 
-const links = computed(() => [
+const staticLinks = [
   { label: 'Início', to: '/' },
   { label: 'Mapa', to: '/mapa' },
-  ...(categories.value ?? []).filter((c) => c.show_in_nav).map((c) => ({ label: c.name, to: `/${c.slug}` })),
-])
+  { label: 'Quiz', to: '/quiz' },
+]
+
+const categoryLinks = computed(() =>
+  (categories.value ?? []).filter((c) => c.show_in_nav).map((c) => ({ label: c.name, to: `/${c.slug}` })),
+)
+
+const links = computed(() => [...staticLinks, ...categoryLinks.value])
+
+const categoriesMenuOpen = ref(false)
+const isCategoryActive = computed(() => categoryLinks.value.some((l) => route.path.startsWith(l.to)))
+
+function toggleCategoriesMenu() {
+  categoriesMenuOpen.value = !categoriesMenuOpen.value
+}
+
+function onCategoriesBlur() {
+  setTimeout(() => { categoriesMenuOpen.value = false }, 150)
+}
 
 const menuOpen = ref(false)
 const searchOpen = ref(false)
@@ -87,7 +105,7 @@ function submitSearch() {
   <header class="site-nav">
     <div class="nav-inner">
       <ul class="nav-links">
-        <li v-for="link in links" :key="link.to">
+        <li v-for="link in staticLinks" :key="link.to">
           <NuxtLink
             :to="link.to"
             class="nav-link"
@@ -96,6 +114,32 @@ function submitSearch() {
           >
             {{ link.label }}
           </NuxtLink>
+        </li>
+        <li v-if="categoryLinks.length" class="nav-dropdown" :class="{ 'nav-dropdown--open': categoriesMenuOpen }">
+          <button
+            type="button"
+            class="nav-link nav-dropdown-trigger"
+            :class="{ 'nav-link--active': isCategoryActive }"
+            :aria-expanded="categoriesMenuOpen"
+            @click="toggleCategoriesMenu"
+            @blur="onCategoriesBlur"
+            @keydown.escape="categoriesMenuOpen = false"
+          >
+            Categorias
+            <Icon name="heroicons:chevron-down" class="dropdown-chevron" />
+          </button>
+          <div v-if="categoriesMenuOpen" class="dropdown-panel">
+            <NuxtLink
+              v-for="link in categoryLinks"
+              :key="link.to"
+              :to="link.to"
+              class="dropdown-item"
+              active-class="dropdown-item--active"
+              @click="categoriesMenuOpen = false"
+            >
+              {{ link.label }}
+            </NuxtLink>
+          </div>
         </li>
       </ul>
 
@@ -242,6 +286,67 @@ function submitSearch() {
   background: rgba(245, 241, 230, 0.08);
 }
 .nav-link--active {
+  color: #d4845c;
+  background: rgba(212, 132, 92, 0.12);
+}
+
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-chevron {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s ease;
+}
+.nav-dropdown--open .dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.dropdown-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: rgba(12, 38, 22, 0.98);
+  border: 1px solid rgba(245, 241, 230, 0.12);
+  border-radius: 8px;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 10px 16px;
+  color: rgba(245, 241, 230, 0.8);
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  border-top: 1px solid rgba(245, 241, 230, 0.07);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.dropdown-item:first-child {
+  border-top: none;
+}
+.dropdown-item:hover {
+  color: #f5f1e6;
+  background: rgba(245, 241, 230, 0.08);
+}
+.dropdown-item--active {
   color: #d4845c;
   background: rgba(212, 132, 92, 0.12);
 }
