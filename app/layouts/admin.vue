@@ -69,6 +69,10 @@ async function handleLogout() {
             <Icon name="heroicons:adjustments-horizontal" class="sidebar-icon" />
             Navegação
           </NuxtLink>
+          <NuxtLink to="/admin/quiz" class="sidebar-link" active-class="sidebar-link--active">
+            <Icon name="heroicons:puzzle-piece" class="sidebar-icon" />
+            Quiz
+          </NuxtLink>
 
           <div class="sidebar-divider" />
 
