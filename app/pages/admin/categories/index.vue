@@ -71,8 +71,8 @@ const form = reactive({
   name: '',
   slug: '',
   description: '',
-  gradient_from: '2D6A4F',
-  gradient_to: 'D4845C',
+  gradient_from: '151225',
+  gradient_to: 'C9A24B',
   parent_id: null as number | null,
 })
 
@@ -89,7 +89,7 @@ watch(() => form.name, (val) => {
 function openCreate(parentId: number | null = null) {
   editingId.value = null
   error.value = ''
-  Object.assign(form, { name: '', slug: '', description: '', gradient_from: '2D6A4F', gradient_to: 'D4845C', parent_id: parentId })
+  Object.assign(form, { name: '', slug: '', description: '', gradient_from: '151225', gradient_to: 'C9A24B', parent_id: parentId })
   modalRef.value?.showModal()
 }
 
@@ -100,8 +100,8 @@ function openEdit(cat: Category) {
     name: cat.name,
     slug: cat.slug,
     description: cat.description ?? '',
-    gradient_from: cat.gradient[0] ?? '2D6A4F',
-    gradient_to: cat.gradient[1] ?? 'D4845C',
+    gradient_from: cat.gradient[0] ?? '151225',
+    gradient_to: cat.gradient[1] ?? 'C9A24B',
     parent_id: cat.parent_id,
   })
   modalRef.value?.showModal()
@@ -314,11 +314,11 @@ async function deleteCategory(cat: Category) {
             <div class="gradient-row">
               <div class="gradient-input-group">
                 <span class="field-sublabel">Cor inicial (hex sem #)</span>
-                <input v-model="form.gradient_from" class="field-input" type="text" maxlength="6" placeholder="2D6A4F" />
+                <input v-model="form.gradient_from" class="field-input" type="text" maxlength="6" placeholder="151225" />
               </div>
               <div class="gradient-input-group">
                 <span class="field-sublabel">Cor final (hex sem #)</span>
-                <input v-model="form.gradient_to" class="field-input" type="text" maxlength="6" placeholder="D4845C" />
+                <input v-model="form.gradient_to" class="field-input" type="text" maxlength="6" placeholder="C9A24B" />
               </div>
               <div
                 class="gradient-preview"
@@ -368,7 +368,7 @@ async function deleteCategory(cat: Category) {
 .btn-new {
   padding: 10px 20px;
   background: var(--adm-accent);
-  color: #f5f1e6;
+  color: #D8D2E6;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -581,7 +581,7 @@ async function deleteCategory(cat: Category) {
 .action-delete {
   background: none;
   border: none;
-  color: #c9724a;
+  color: #7C2D3B;
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
@@ -711,7 +711,7 @@ async function deleteCategory(cat: Category) {
 }
 .field-input:focus {
   border-color: var(--adm-accent);
-  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+  box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.1);
 }
 .field-textarea {
   resize: vertical;
@@ -745,12 +745,12 @@ async function deleteCategory(cat: Category) {
 
 .error-msg {
   font-size: 13px;
-  color: #c9724a;
+  color: #7C2D3B;
   margin: 0;
   padding: 10px 14px;
-  background: rgba(201, 114, 74, 0.08);
+  background: rgba(124, 45, 59, 0.08);
   border-radius: 6px;
-  border-left: 3px solid #c9724a;
+  border-left: 3px solid #7C2D3B;
   font-family: 'Inter', sans-serif;
 }
 
@@ -781,7 +781,7 @@ async function deleteCategory(cat: Category) {
 .btn-save {
   padding: 10px 24px;
   background: var(--adm-accent);
-  color: #f5f1e6;
+  color: #D8D2E6;
   border: none;
   border-radius: 8px;
   font-size: 14px;

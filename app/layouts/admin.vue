@@ -31,10 +31,10 @@ async function handleLogout() {
           <span class="admin-email">{{ user?.email }}</span>
           <button
             class="theme-btn"
-            :aria-label="theme === 'discovery' ? 'Ativar modo escuro' : 'Ativar modo claro'"
+            :aria-label="theme === 'pergaminho' ? 'Ativar modo escuro' : 'Ativar modo claro'"
             @click="toggleTheme"
           >
-            <Icon :name="theme === 'discovery' ? 'heroicons:moon' : 'heroicons:sun'" class="theme-icon" />
+            <Icon :name="theme === 'pergaminho' ? 'heroicons:moon' : 'heroicons:sun'" class="theme-icon" />
           </button>
           <button class="logout-btn" @click="handleLogout">Sair</button>
         </div>
@@ -101,7 +101,7 @@ async function handleLogout() {
   padding: 0 24px 0 8px;
   height: 64px;
   background: var(--adm-nav-bg);
-  border-bottom: 1px solid rgba(245, 241, 230, 0.1);
+  border-bottom: 1px solid rgba(216, 210, 230, 0.1);
   position: sticky;
   top: 0;
   z-index: 40;
@@ -114,10 +114,10 @@ async function handleLogout() {
 }
 
 .drawer-btn {
-  color: #f5f1e6;
+  color: #D8D2E6;
 }
 .drawer-btn:hover {
-  background: rgba(245, 241, 230, 0.1);
+  background: rgba(216, 210, 230, 0.1);
 }
 
 .hamburger-icon {
@@ -129,7 +129,7 @@ async function handleLogout() {
   font-family: 'Merriweather', serif;
   font-size: 17px;
   font-weight: 700;
-  color: #f5f1e6;
+  color: #D8D2E6;
 }
 
 .admin-user {
@@ -140,13 +140,13 @@ async function handleLogout() {
 
 .admin-email {
   font-size: 13px;
-  color: rgba(245, 241, 230, 0.65);
+  color: rgba(216, 210, 230, 0.65);
 }
 
 .theme-btn {
   background: transparent;
   border: none;
-  color: rgba(245, 241, 230, 0.7);
+  color: rgba(216, 210, 230, 0.7);
   cursor: pointer;
   padding: 6px;
   border-radius: 6px;
@@ -155,8 +155,8 @@ async function handleLogout() {
   transition: color 0.2s ease, background 0.2s ease;
 }
 .theme-btn:hover {
-  background: rgba(245, 241, 230, 0.1);
-  color: #f5f1e6;
+  background: rgba(216, 210, 230, 0.1);
+  color: #D8D2E6;
 }
 
 .theme-icon {
@@ -167,17 +167,17 @@ async function handleLogout() {
 .logout-btn {
   padding: 7px 16px;
   background: transparent;
-  border: 1px solid rgba(245, 241, 230, 0.3);
+  border: 1px solid rgba(216, 210, 230, 0.3);
   border-radius: 6px;
-  color: #f5f1e6;
+  color: #D8D2E6;
   font-size: 13px;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 .logout-btn:hover {
-  background: rgba(245, 241, 230, 0.1);
-  border-color: rgba(245, 241, 230, 0.5);
+  background: rgba(216, 210, 230, 0.1);
+  border-color: rgba(216, 210, 230, 0.5);
 }
 
 /* MAIN */
@@ -199,14 +199,14 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   padding: 0 24px;
-  border-bottom: 1px solid rgba(245, 241, 230, 0.1);
+  border-bottom: 1px solid rgba(216, 210, 230, 0.1);
 }
 
 .sidebar-brand-text {
   font-family: 'Merriweather', serif;
   font-size: 16px;
   font-weight: 700;
-  color: #f5f1e6;
+  color: #D8D2E6;
 }
 
 .sidebar-nav {
@@ -222,7 +222,7 @@ async function handleLogout() {
   gap: 10px;
   padding: 10px 12px;
   border-radius: 8px;
-  color: rgba(245, 241, 230, 0.75);
+  color: rgba(216, 210, 230, 0.75);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -230,12 +230,12 @@ async function handleLogout() {
   transition: all 0.2s ease;
 }
 .sidebar-link:hover {
-  background: rgba(245, 241, 230, 0.08);
-  color: #f5f1e6;
+  background: rgba(216, 210, 230, 0.08);
+  color: #D8D2E6;
 }
 .sidebar-link--active {
-  background: rgba(212, 132, 92, 0.2);
-  color: #d4845c;
+  background: rgba(201, 162, 75, 0.2);
+  color: #C9A24B;
 }
 
 .sidebar-icon {
@@ -246,16 +246,16 @@ async function handleLogout() {
 
 .sidebar-divider {
   height: 1px;
-  background: rgba(245, 241, 230, 0.1);
+  background: rgba(216, 210, 230, 0.1);
   margin: 8px 12px;
 }
 
 .sidebar-link--external {
-  color: rgba(245, 241, 230, 0.5);
+  color: rgba(216, 210, 230, 0.5);
   font-size: 13px;
 }
 .sidebar-link--external:hover {
-  color: rgba(245, 241, 230, 0.85);
+  color: rgba(216, 210, 230, 0.85);
 }
 
 @media (max-width: 640px) {

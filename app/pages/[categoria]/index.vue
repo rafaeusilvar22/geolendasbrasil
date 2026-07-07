@@ -48,8 +48,8 @@ useHead({ link: [{ rel: 'canonical', href: canonicalUrl }] })
       <div
         class="category-hero-bg"
         :style="{
-          '--gradient-from': `#${category?.gradient?.[0] ?? '2D6A4F'}`,
-          '--gradient-to': `#${category?.gradient?.[1] ?? '8B6F47'}`,
+          '--gradient-from': `#${category?.gradient?.[0] ?? '151225'}`,
+          '--gradient-to': `#${category?.gradient?.[1] ?? 'C9A24B'}`,
         }"
       />
       <div class="category-hero-content">

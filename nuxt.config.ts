@@ -16,8 +16,8 @@ export default defineNuxtConfig({
       name: 'Mundo Mistério',
       short_name: 'Mistério',
       description: 'Histórias, lendas, tradições e geografia dos estados brasileiros',
-      theme_color: '#2D6A4F',
-      background_color: '#f5f1e6',
+      theme_color: '#151225',
+      background_color: '#F2E9D8',
       display: 'standalone',
       lang: 'pt-BR',
       icons: [
@@ -36,7 +36,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       meta: [
-        { name: 'theme-color', content: '#2D6A4F' },
+        { name: 'theme-color', content: '#151225' },
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },

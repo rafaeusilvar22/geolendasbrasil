@@ -50,18 +50,18 @@ defineEmits<{ click: [] }>()
 
 .option-btn--selected {
   border-color: var(--pg-accent);
-  background: rgba(212, 132, 92, 0.08);
+  background: rgba(201, 162, 75, 0.08);
 }
 
 .option-btn--correct {
-  border-color: #2d6a4f;
-  background: rgba(45, 106, 79, 0.12);
-  color: #2d6a4f;
+  border-color: #4B6B5C;
+  background: rgba(75, 107, 92, 0.12);
+  color: #4B6B5C;
 }
 
 .option-btn--incorrect {
-  border-color: #b3261e;
-  background: rgba(179, 38, 30, 0.1);
-  color: #b3261e;
+  border-color: #7C2D3B;
+  background: rgba(124, 45, 59, 0.1);
+  color: #7C2D3B;
 }
 </style>

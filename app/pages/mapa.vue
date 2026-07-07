@@ -378,7 +378,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/mapa` }] })
 .see-more-btn:hover {
   border-color: var(--pg-accent);
   color: var(--pg-accent);
-  background: rgba(212, 132, 92, 0.08);
+  background: rgba(201, 162, 75, 0.08);
 }
 
 .empty-state {

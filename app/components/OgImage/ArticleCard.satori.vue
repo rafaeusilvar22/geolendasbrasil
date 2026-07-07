@@ -5,7 +5,7 @@
       flexDirection: 'column',
       width: '100%',
       height: '100%',
-      backgroundColor: '#1b4332',
+      backgroundColor: '#151225',
       padding: '64px',
       fontFamily: 'Inter, sans-serif',
     }"
@@ -16,7 +16,7 @@
         :style="{
           fontSize: '16px',
           fontWeight: '600',
-          color: 'rgba(245,241,230,0.55)',
+          color: 'rgba(216,210,230,0.55)',
           letterSpacing: '3px',
           textTransform: 'uppercase',
         }"
@@ -32,13 +32,13 @@
         <span
           v-if="state"
           :style="{
-            backgroundColor: 'rgba(245,241,230,0.1)',
-            border: '1px solid rgba(245,241,230,0.2)',
+            backgroundColor: 'rgba(216,210,230,0.1)',
+            border: '1px solid rgba(216,210,230,0.2)',
             borderRadius: '20px',
             padding: '4px 14px',
             fontSize: '12px',
             fontWeight: '700',
-            color: '#f5f1e6',
+            color: '#D8D2E6',
             letterSpacing: '1px',
             textTransform: 'uppercase',
           }"
@@ -48,13 +48,13 @@
         <span
           v-if="category"
           :style="{
-            backgroundColor: 'rgba(212,132,92,0.2)',
-            border: '1px solid rgba(212,132,92,0.4)',
+            backgroundColor: 'rgba(201,162,75,0.2)',
+            border: '1px solid rgba(201,162,75,0.4)',
             borderRadius: '20px',
             padding: '4px 14px',
             fontSize: '12px',
             fontWeight: '700',
-            color: '#e8a87c',
+            color: '#E3C077',
             letterSpacing: '1px',
             textTransform: 'uppercase',
           }"
@@ -68,7 +68,7 @@
         :style="{
           fontSize: '52px',
           fontWeight: '700',
-          color: '#f5f1e6',
+          color: '#D8D2E6',
           lineHeight: '1.2',
           marginBottom: '20px',
         }"
@@ -80,7 +80,7 @@
       <div
         :style="{
           fontSize: '20px',
-          color: 'rgba(245,241,230,0.68)',
+          color: 'rgba(216,210,230,0.68)',
           lineHeight: '1.5',
           marginBottom: '36px',
         }"
@@ -93,7 +93,7 @@
         :style="{
           width: '56px',
           height: '4px',
-          backgroundColor: '#d4845c',
+          backgroundColor: '#C9A24B',
           borderRadius: '2px',
         }"
       />

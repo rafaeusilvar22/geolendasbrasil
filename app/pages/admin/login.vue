@@ -83,7 +83,7 @@ async function handleSubmit() {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #2d6a4f, #1b4332, #8b6f47);
+  background: linear-gradient(to bottom right, #151225, #0E0C18, #7C2D3B);
   background-attachment: fixed;
   display: flex;
   align-items: center;
@@ -95,7 +95,7 @@ async function handleSubmit() {
 .login-card {
   width: 100%;
   max-width: 400px;
-  background: #f5f1e6;
+  background: #F2E9D8;
   border-radius: 12px;
   padding: 48px 40px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -110,14 +110,14 @@ async function handleSubmit() {
   font-family: 'Merriweather', serif;
   font-size: 26px;
   font-weight: 700;
-  color: #1b4332;
+  color: #151225;
   margin: 0 0 8px 0;
   line-height: 1.2;
 }
 
 .login-subtitle {
   font-size: 13px;
-  color: #8b6f47;
+  color: #7A6A52;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -139,17 +139,17 @@ async function handleSubmit() {
 .field-label {
   font-size: 13px;
   font-weight: 600;
-  color: #3d2817;
+  color: #211C2E;
   letter-spacing: 0.3px;
 }
 
 .field-input {
   padding: 12px 14px;
-  border: 1.5px solid #d9cfc1;
+  border: 1.5px solid #D9CBA8;
   border-radius: 8px;
   font-size: 14px;
   font-family: 'Inter', sans-serif;
-  color: #1a1a1a;
+  color: #211C2E;
   background: #fff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   outline: none;
@@ -158,8 +158,8 @@ async function handleSubmit() {
   color: #bbb;
 }
 .field-input:focus {
-  border-color: #2d6a4f;
-  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.12);
+  border-color: #C9A24B;
+  box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.12);
 }
 .field-input:disabled {
   opacity: 0.6;
@@ -168,12 +168,12 @@ async function handleSubmit() {
 
 .error-msg {
   font-size: 13px;
-  color: #c9724a;
+  color: #7C2D3B;
   margin: 0;
   padding: 10px 14px;
-  background: rgba(201, 114, 74, 0.08);
+  background: rgba(124, 45, 59, 0.08);
   border-radius: 6px;
-  border-left: 3px solid #c9724a;
+  border-left: 3px solid #7C2D3B;
 }
 
 .submit-btn {
@@ -183,8 +183,8 @@ async function handleSubmit() {
   gap: 8px;
   margin-top: 4px;
   padding: 13px;
-  background: #2d6a4f;
-  color: #f5f1e6;
+  background: #C9A24B;
+  color: #D8D2E6;
   border: none;
   border-radius: 8px;
   font-size: 15px;
@@ -194,7 +194,7 @@ async function handleSubmit() {
   transition: background 0.2s ease;
 }
 .submit-btn:hover:not(:disabled) {
-  background: #1b4332;
+  background: #A67F32;
 }
 .submit-btn:disabled {
   opacity: 0.7;
@@ -204,8 +204,8 @@ async function handleSubmit() {
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(245, 241, 230, 0.4);
-  border-top-color: #f5f1e6;
+  border: 2px solid rgba(216, 210, 230, 0.4);
+  border-top-color: #D8D2E6;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;

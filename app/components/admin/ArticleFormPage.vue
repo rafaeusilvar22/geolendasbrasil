@@ -394,7 +394,7 @@ async function handleSubmit() {
 .btn-save {
   padding: 10px 24px;
   background: var(--adm-accent);
-  color: #f5f1e6;
+  color: #D8D2E6;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -415,12 +415,12 @@ async function handleSubmit() {
 
 .error-msg {
   font-size: 13px;
-  color: #c9724a;
+  color: #7C2D3B;
   margin: 0 0 20px 0;
   padding: 12px 16px;
-  background: rgba(201, 114, 74, 0.08);
+  background: rgba(124, 45, 59, 0.08);
   border-radius: 6px;
-  border-left: 3px solid #c9724a;
+  border-left: 3px solid #7C2D3B;
   font-family: 'Inter', sans-serif;
 }
 
@@ -498,7 +498,7 @@ async function handleSubmit() {
 }
 .btn-ai:hover:not(:disabled) {
   background: var(--adm-accent);
-  color: #f5f1e6;
+  color: #D8D2E6;
 }
 .btn-ai:disabled {
   opacity: 0.45;
@@ -507,7 +507,7 @@ async function handleSubmit() {
 
 .ai-error {
   font-size: 12px;
-  color: #c9724a;
+  color: #7C2D3B;
   margin: 4px 0 0;
   font-family: 'Inter', sans-serif;
 }
@@ -531,7 +531,7 @@ async function handleSubmit() {
 }
 .field-input:focus {
   border-color: var(--adm-accent);
-  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+  box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.1);
 }
 .field-textarea {
   resize: vertical;
@@ -574,8 +574,8 @@ async function handleSubmit() {
 .btn-delete-audio {
   padding: 4px 12px;
   background: transparent;
-  color: #c9724a;
-  border: 1.5px solid #c9724a;
+  color: #7C2D3B;
+  border: 1.5px solid #7C2D3B;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
@@ -585,7 +585,7 @@ async function handleSubmit() {
   white-space: nowrap;
 }
 .btn-delete-audio:hover:not(:disabled) {
-  background: #c9724a;
+  background: #7C2D3B;
   color: #fff;
 }
 .btn-delete-audio:disabled {

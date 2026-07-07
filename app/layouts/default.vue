@@ -119,15 +119,15 @@ function seekTo(e: MouseEvent) {
   left: 0;
   right: 0;
   z-index: 99998;
-  background: rgba(10, 8, 5, 0.97);
+  background: rgba(14, 12, 24, 0.97);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid rgba(192, 168, 130, 0.1);
+  border-top: 1px solid rgba(140, 132, 163, 0.1);
 }
 
 .player-seek-track {
   height: 3px;
-  background: rgba(192, 168, 130, 0.12);
+  background: rgba(140, 132, 163, 0.12);
   cursor: pointer;
   position: relative;
   transition: height 0.15s ease;
@@ -139,7 +139,7 @@ function seekTo(e: MouseEvent) {
   top: 0;
   left: 0;
   height: 100%;
-  background: linear-gradient(90deg, #2D6A4F, #52b788);
+  background: linear-gradient(90deg, #C9A24B, #E3C077);
   border-radius: 0 3px 3px 0;
   transition: width 0.1s linear;
   pointer-events: none;
@@ -159,9 +159,9 @@ function seekTo(e: MouseEvent) {
   height: 40px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: #2D6A4F;
+  background: #C9A24B;
   border: none;
-  color: #f5f1e6;
+  color: #D8D2E6;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -169,7 +169,7 @@ function seekTo(e: MouseEvent) {
   padding-left: 2px;
   transition: background 0.2s ease, transform 0.15s ease;
 }
-.player-btn-play:hover { background: #3a8a65; transform: scale(1.06); }
+.player-btn-play:hover { background: #A67F32; transform: scale(1.06); }
 
 .player-info {
   flex: 1;
@@ -183,7 +183,7 @@ function seekTo(e: MouseEvent) {
   font-family: 'Merriweather', serif;
   font-size: 14px;
   font-weight: 700;
-  color: #ede3d4;
+  color: #D8D2E6;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -192,7 +192,7 @@ function seekTo(e: MouseEvent) {
 .player-sub {
   font-family: 'Inter', sans-serif;
   font-size: 12px;
-  color: rgba(192, 168, 130, 0.5);
+  color: rgba(140, 132, 163, 0.5);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -202,7 +202,7 @@ function seekTo(e: MouseEvent) {
 
 .player-time {
   font-variant-numeric: tabular-nums;
-  color: rgba(192, 168, 130, 0.38);
+  color: rgba(140, 132, 163, 0.38);
 }
 
 .player-btn-close {
@@ -210,9 +210,9 @@ function seekTo(e: MouseEvent) {
   height: 32px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: rgba(192, 168, 130, 0.07);
-  border: 1px solid rgba(192, 168, 130, 0.12);
-  color: rgba(192, 168, 130, 0.45);
+  background: rgba(140, 132, 163, 0.07);
+  border: 1px solid rgba(140, 132, 163, 0.12);
+  color: rgba(140, 132, 163, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -220,9 +220,9 @@ function seekTo(e: MouseEvent) {
   transition: all 0.2s ease;
 }
 .player-btn-close:hover {
-  background: rgba(192, 168, 130, 0.14);
-  border-color: rgba(192, 168, 130, 0.28);
-  color: rgba(192, 168, 130, 0.85);
+  background: rgba(140, 132, 163, 0.14);
+  border-color: rgba(140, 132, 163, 0.28);
+  color: rgba(140, 132, 163, 0.85);
 }
 
 .player-slide-enter-active,

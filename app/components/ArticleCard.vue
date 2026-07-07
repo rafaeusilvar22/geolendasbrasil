@@ -20,7 +20,7 @@ const coverImage = computed(() => {
 const fallbackGradient = computed(() => {
   const g = props.article.category?.gradient
   if (g?.[0] && g?.[1]) return { from: `#${g[0]}`, to: `#${g[1]}` }
-  return { from: '#2D6A4F', to: '#8B6F47' }
+  return { from: '#151225', to: '#C9A24B' }
 })
 
 const articleUrl = computed(() => {
@@ -121,7 +121,7 @@ const articleUrl = computed(() => {
 
 .card-type-label {
   position: relative;
-  color: #f5f1e6;
+  color: #D8D2E6;
   font-size: 13px;
   font-weight: 500;
   font-family: 'Inter', sans-serif;
@@ -135,12 +135,12 @@ const articleUrl = computed(() => {
   align-items: center;
   gap: 5px;
   padding: 4px 9px;
-  background: rgba(10, 8, 5, 0.65);
+  background: rgba(14, 12, 24, 0.65);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 20px;
-  color: #f5f1e6;
+  color: #D8D2E6;
   font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 600;

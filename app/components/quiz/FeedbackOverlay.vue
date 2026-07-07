@@ -24,13 +24,13 @@ defineEmits<{ next: [] }>()
 }
 
 .feedback--correct {
-  background: rgba(45, 106, 79, 0.1);
-  border-color: #2d6a4f;
+  background: rgba(75, 107, 92, 0.1);
+  border-color: #4B6B5C;
 }
 
 .feedback--incorrect {
-  background: rgba(179, 38, 30, 0.08);
-  border-color: #b3261e;
+  background: rgba(124, 45, 59, 0.08);
+  border-color: #7C2D3B;
 }
 
 .feedback-title {

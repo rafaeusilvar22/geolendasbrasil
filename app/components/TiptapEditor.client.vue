@@ -180,7 +180,7 @@ function insertLink() {
 }
 .editor-wrapper:focus-within {
   border-color: var(--adm-accent);
-  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+  box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.1);
 }
 
 .editor-toolbar {
@@ -212,7 +212,7 @@ function insertLink() {
 }
 .tool-btn--active {
   background: var(--adm-accent);
-  color: #f5f1e6;
+  color: #D8D2E6;
   border-color: var(--adm-accent);
 }
 .tool-btn:disabled {
@@ -273,7 +273,7 @@ function insertLink() {
   margin-bottom: 0.25em;
 }
 .editor-content :deep(.ProseMirror blockquote) {
-  border-left: 4px solid #d4845c;
+  border-left: 4px solid #C9A24B;
   padding-left: 16px;
   margin: 1em 0;
   color: var(--adm-text-secondary);

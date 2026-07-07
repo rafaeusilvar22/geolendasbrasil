@@ -1,7 +1,7 @@
-export type Theme = 'discovery' | 'forest'
+export type Theme = 'pergaminho' | 'penumbra'
 
 export function useTheme() {
-  const theme = useState<Theme>('theme', () => 'discovery')
+  const theme = useState<Theme>('theme', () => 'pergaminho')
 
   function setTheme(t: Theme) {
     theme.value = t
@@ -12,7 +12,7 @@ export function useTheme() {
   }
 
   function toggle() {
-    setTheme(theme.value === 'discovery' ? 'forest' : 'discovery')
+    setTheme(theme.value === 'pergaminho' ? 'penumbra' : 'pergaminho')
   }
 
   return { theme, setTheme, toggle }

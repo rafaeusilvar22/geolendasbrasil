@@ -202,7 +202,7 @@ function tryAgain() {
   border: 1.5px solid var(--pg-card-border);
 }
 
-[data-theme="forest"] .share-btn img[alt="X"] {
+[data-theme="penumbra"] .share-btn img[alt="X"] {
   filter: invert(1);
 }
 </style>

@@ -169,13 +169,13 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/busca` }] })
   color: var(--pg-text-muted);
 }
 .search-input:focus {
-  border-color: #d4845c;
+  border-color: #C9A24B;
 }
 
 .search-btn {
   height: 48px;
   padding: 0 24px;
-  background: #d4845c;
+  background: #C9A24B;
   border: none;
   border-radius: 8px;
   color: #fff;
@@ -187,7 +187,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/busca` }] })
   transition: background 0.2s ease;
 }
 .search-btn:hover {
-  background: #c0714a;
+  background: #A67F32;
 }
 
 .content {
@@ -247,7 +247,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/busca` }] })
 .back-link {
   display: inline-block;
   margin-top: 8px;
-  color: #d4845c;
+  color: #C9A24B;
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;
