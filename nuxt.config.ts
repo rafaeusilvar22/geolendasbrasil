@@ -13,8 +13,8 @@ export default defineNuxtConfig({
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
-      name: 'Descobertas Brasil',
-      short_name: 'Descobertas',
+      name: 'Mundo Mistério',
+      short_name: 'Mistério',
       description: 'Histórias, lendas, tradições e geografia dos estados brasileiros',
       theme_color: '#2D6A4F',
       background_color: '#f5f1e6',
@@ -40,7 +40,7 @@ export default defineNuxtConfig({
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },
-        { name: 'apple-mobile-web-app-title', content: 'Descobertas' },
+        { name: 'apple-mobile-web-app-title', content: 'Mistério' },
       ],
       link: [
         { rel: 'manifest', href: '/manifest.webmanifest' },

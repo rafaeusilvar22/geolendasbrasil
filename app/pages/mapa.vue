@@ -53,11 +53,10 @@ const articlesByCategory = computed<CategoryGroup[]>(() => {
   return Object.values(grouped).sort((a, b) => a.category.sort_order - b.category.sort_order)
 })
 
-const SITE_URL = 'https://geolendasbrasil.netlify.app'
 useSeoMeta({
-  title: 'Mapa Interativo — GeoLendas Brasil',
+  title: `Mapa Interativo — ${SITE_NAME}`,
   description: 'Explore as histórias, lendas e tradições do Brasil estado por estado. Clique no mapa para descobrir.',
-  ogTitle: 'Mapa Interativo — GeoLendas Brasil',
+  ogTitle: `Mapa Interativo — ${SITE_NAME}`,
   ogDescription: 'Explore as histórias, lendas e tradições do Brasil estado por estado.',
   ogUrl: `${SITE_URL}/mapa`,
   ogType: 'website',
@@ -159,7 +158,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/mapa` }] })
 
     <footer class="footer">
       <p class="footer-text">
-        GeoLendas Brasil © {{ new Date().getFullYear() }} | Preservando histórias, celebrando culturas
+        {{ SITE_NAME }} © {{ new Date().getFullYear() }} | Preservando histórias, celebrando culturas
       </p>
     </footer>
   </div>

@@ -66,7 +66,6 @@ async function copyLink() {
   setTimeout(() => { copySuccess.value = false }, 2000)
 }
 
-const SITE_URL = 'https://geolendasbrasil.netlify.app'
 const canonicalUrl = `${SITE_URL}/${catSlug}/${artSlug}`
 
 const ogDescription = article.value!.excerpt.length > 120
@@ -81,7 +80,7 @@ defineOgImage('ArticleCard', {
 })
 
 useSeoMeta({
-  title: `${article.value!.title} — GeoLendas Brasil`,
+  title: `${article.value!.title} — ${SITE_NAME}`,
   description: article.value!.excerpt,
   ogTitle: article.value!.title,
   ogDescription: article.value!.excerpt,
@@ -106,7 +105,7 @@ useHead({
       inLanguage: 'pt-BR',
       publisher: {
         '@type': 'Organization',
-        name: 'GeoLendas Brasil',
+        name: SITE_NAME,
         url: SITE_URL,
       },
     }),
@@ -258,7 +257,7 @@ function openPlayer() {
         <div v-if="isImmersive" class="immersive-overlay">
           <div class="immersive-topbar">
             <div class="immersive-progress-bar" :style="{ width: readingProgress + '%' }" />
-            <span class="immersive-logo">GeoLendas Brasil</span>
+            <span class="immersive-logo">{{ SITE_NAME }}</span>
             <div class="immersive-controls">
               <button class="immersive-ctrl" title="Diminuir fonte" @click="decreaseFontSize">A−</button>
               <span class="immersive-font-size">{{ immersiveFontSize }}</span>

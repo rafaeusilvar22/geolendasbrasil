@@ -32,11 +32,10 @@ const allGroups = computed<CategoryGroup[]>(() => {
   )
 })
 
-const SITE_URL = 'https://geolendasbrasil.netlify.app'
 useSeoMeta({
-  title: 'GeoLendas Brasil',
+  title: SITE_NAME,
   description: 'Histórias, lendas, tradições e geografia que moldaram cada estado do Brasil. Explore a magia ancestral das nossas terras.',
-  ogTitle: 'GeoLendas Brasil',
+  ogTitle: SITE_NAME,
   ogDescription: 'Histórias, lendas, tradições e geografia que moldaram cada estado do Brasil.',
   ogUrl: `${SITE_URL}/`,
   ogType: 'website',
@@ -50,7 +49,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/` }] })
   <div class="page-root">
     <div class="hero">
       <div class="hero-inner">
-        <h1 class="hero-title">GeoLendas Brasil</h1>
+        <h1 class="hero-title">{{ SITE_NAME }}</h1>
         <p class="hero-subtitle">
           Histórias, lendas, tradições e geografia que moldaram cada estado do Brasil. Explore a
           magia ancestral das nossas terras.
@@ -100,7 +99,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/` }] })
     </div>
 
     <footer class="footer">
-      <p class="footer-text">GeoLendas Brasil © {{ new Date().getFullYear() }} | Preservando histórias, celebrando culturas</p>
+      <p class="footer-text">{{ SITE_NAME }} © {{ new Date().getFullYear() }} | Preservando histórias, celebrando culturas</p>
     </footer>
   </div>
 </template>

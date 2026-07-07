@@ -38,7 +38,7 @@ async function handleSubmit() {
   <div class="login-page">
     <div class="login-card">
       <div class="login-header">
-        <h1 class="login-title">GeoLendas Brasil</h1>
+        <h1 class="login-title">{{ SITE_NAME }}</h1>
         <p class="login-subtitle">Acesso administrativo</p>
       </div>
 

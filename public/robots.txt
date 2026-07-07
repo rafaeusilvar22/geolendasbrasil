@@ -1,4 +1,4 @@
 User-Agent: *
 Disallow: /admin/
 
-Sitemap: https://geolendasbrasil.netlify.app/sitemap.xml
+Sitemap: https://mundomisterio.com.br/sitemap.xml

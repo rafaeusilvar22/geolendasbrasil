@@ -1,9 +1,8 @@
 <script setup lang="ts">
-const SITE_URL = 'https://geolendasbrasil.netlify.app'
 useSeoMeta({
-  title: 'Quiz de Lendas Brasileiras — GeoLendas Brasil',
+  title: `Quiz de Lendas Brasileiras — ${SITE_NAME}`,
   description: 'Teste seus conhecimentos sobre lendas, folclore e geografia do Brasil em um quiz interativo.',
-  ogTitle: 'Quiz de Lendas Brasileiras — GeoLendas Brasil',
+  ogTitle: `Quiz de Lendas Brasileiras — ${SITE_NAME}`,
   ogDescription: 'Teste seus conhecimentos sobre lendas, folclore e geografia do Brasil.',
   ogUrl: `${SITE_URL}/quiz`,
   ogType: 'website',

@@ -24,7 +24,7 @@ async function handleLogout() {
           <label for="admin-drawer" class="btn btn-ghost btn-square drawer-btn">
             <Icon name="heroicons:bars-3" class="hamburger-icon" />
           </label>
-          <span class="admin-title">GeoLendas Brasil</span>
+          <span class="admin-title">{{ SITE_NAME }}</span>
         </div>
 
         <div class="admin-user">
@@ -49,7 +49,7 @@ async function handleLogout() {
       <label for="admin-drawer" aria-label="Fechar menu" class="drawer-overlay" />
       <aside class="admin-sidebar">
         <div class="sidebar-brand">
-          <span class="sidebar-brand-text">GeoLendas Brasil</span>
+          <span class="sidebar-brand-text">{{ SITE_NAME }}</span>
         </div>
 
         <nav class="sidebar-nav">

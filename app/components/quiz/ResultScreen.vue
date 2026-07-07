@@ -5,8 +5,6 @@ const { questions, answered, score, percentage, difficulty, resetQuiz, startQuiz
 const { logAttempt } = useQuizAnalytics()
 const client = useSupabaseClient()
 
-const SITE_URL = 'https://geolendasbrasil.netlify.app'
-
 const level = computed(() => {
   if (percentage.value >= 90) return { name: 'Lenda Viva', emoji: '🏆' }
   if (percentage.value >= 70) return { name: 'Mestre do Folclore', emoji: '🌟' }

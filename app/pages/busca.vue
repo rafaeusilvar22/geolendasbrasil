@@ -31,9 +31,8 @@ function refineSearch() {
   router.push({ path: '/busca', query: { q: term } })
 }
 
-const SITE_URL = 'https://geolendasbrasil.netlify.app'
 useSeoMeta({
-  title: q.value ? `Busca: "${q.value}" — GeoLendas Brasil` : 'Busca — GeoLendas Brasil',
+  title: q.value ? `Busca: "${q.value}" — ${SITE_NAME}` : `Busca — ${SITE_NAME}`,
   description: 'Pesquise artigos sobre história, lendas e cultura dos estados brasileiros.',
   ogUrl: `${SITE_URL}/busca`,
 })
@@ -97,7 +96,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/busca` }] })
     </div>
 
     <footer class="footer">
-      <p class="footer-text">GeoLendas Brasil © {{ new Date().getFullYear() }} | Preservando histórias, celebrando culturas</p>
+      <p class="footer-text">{{ SITE_NAME }} © {{ new Date().getFullYear() }} | Preservando histórias, celebrando culturas</p>
     </footer>
   </div>
 </template>

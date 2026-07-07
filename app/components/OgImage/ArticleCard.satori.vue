@@ -21,7 +21,7 @@
           textTransform: 'uppercase',
         }"
       >
-        Descobertas Brasil
+        {{ SITE_NAME }}
       </span>
     </div>
 

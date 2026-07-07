@@ -1,6 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server'
 
-const BASE = 'https://geolendasbrasil.netlify.app'
+const BASE = 'https://mundomisterio.com.br'
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event)
