@@ -19,11 +19,19 @@ const staticLinks = [
   { label: 'Quiz', to: '/quiz' },
 ]
 
-const categoryLinks = computed(() =>
-  (categories.value ?? []).filter((c) => c.show_in_nav).map((c) => ({ label: c.name, to: `/${c.slug}` })),
+const categoryTree = computed(() =>
+  buildCategoryTree(categories.value ?? [])
+    .filter((node) => node.show_in_nav)
+    .map((node) => ({ ...node, children: node.children.filter((c) => c.show_in_nav) })),
 )
 
-const links = computed(() => [...staticLinks, ...categoryLinks.value])
+const categoryLinks = computed(() =>
+  categoryTree.value.flatMap((node) =>
+    node.children.length
+      ? node.children.map((c) => ({ label: c.name, to: `/${c.slug}` }))
+      : [{ label: node.name, to: `/${node.slug}` }],
+  ),
+)
 
 const categoriesMenuOpen = ref(false)
 const isCategoryActive = computed(() => categoryLinks.value.some((l) => route.path.startsWith(l.to)))
@@ -129,16 +137,30 @@ function submitSearch() {
             <Icon name="heroicons:chevron-down" class="dropdown-chevron" />
           </button>
           <div v-if="categoriesMenuOpen" class="dropdown-panel">
-            <NuxtLink
-              v-for="link in categoryLinks"
-              :key="link.to"
-              :to="link.to"
-              class="dropdown-item"
-              active-class="dropdown-item--active"
-              @click="categoriesMenuOpen = false"
-            >
-              {{ link.label }}
-            </NuxtLink>
+            <template v-for="node in categoryTree" :key="node.id">
+              <template v-if="node.children.length">
+                <span class="dropdown-group-label">{{ node.name }}</span>
+                <NuxtLink
+                  v-for="child in node.children"
+                  :key="child.id"
+                  :to="`/${child.slug}`"
+                  class="dropdown-item dropdown-item--child"
+                  active-class="dropdown-item--active"
+                  @click="categoriesMenuOpen = false"
+                >
+                  {{ child.name }}
+                </NuxtLink>
+              </template>
+              <NuxtLink
+                v-else
+                :to="`/${node.slug}`"
+                class="dropdown-item"
+                active-class="dropdown-item--active"
+                @click="categoriesMenuOpen = false"
+              >
+                {{ node.name }}
+              </NuxtLink>
+            </template>
           </div>
         </li>
       </ul>
@@ -198,7 +220,7 @@ function submitSearch() {
 
     <div class="mobile-menu" :class="{ 'mobile-menu--open': menuOpen }">
       <ul class="mobile-links">
-        <li v-for="link in links" :key="link.to">
+        <li v-for="link in staticLinks" :key="link.to">
           <NuxtLink
             :to="link.to"
             class="mobile-link"
@@ -209,6 +231,33 @@ function submitSearch() {
             {{ link.label }}
           </NuxtLink>
         </li>
+        <template v-for="node in categoryTree" :key="node.id">
+          <template v-if="node.children.length">
+            <li class="mobile-group-label">{{ node.name }}</li>
+            <li v-for="child in node.children" :key="child.id">
+              <NuxtLink
+                :to="`/${child.slug}`"
+                class="mobile-link mobile-link--child"
+                active-class="mobile-link--active"
+                exact-active-class="mobile-link--active"
+                @click="menuOpen = false"
+              >
+                {{ child.name }}
+              </NuxtLink>
+            </li>
+          </template>
+          <li v-else>
+            <NuxtLink
+              :to="`/${node.slug}`"
+              class="mobile-link"
+              active-class="mobile-link--active"
+              exact-active-class="mobile-link--active"
+              @click="menuOpen = false"
+            >
+              {{ node.name }}
+            </NuxtLink>
+          </li>
+        </template>
       </ul>
       <div class="mobile-search-wrap">
         <form class="mobile-search-form" @submit.prevent="submitSearch">
@@ -349,6 +398,25 @@ function submitSearch() {
 .dropdown-item--active {
   color: #d4845c;
   background: rgba(212, 132, 92, 0.12);
+}
+
+.dropdown-item--child {
+  padding-left: 28px;
+}
+
+.dropdown-group-label {
+  display: block;
+  padding: 10px 16px 4px;
+  color: rgba(245, 241, 230, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  border-top: 1px solid rgba(245, 241, 230, 0.07);
+}
+.dropdown-group-label:first-child {
+  border-top: none;
 }
 
 .search-wrapper {
@@ -539,6 +607,20 @@ function submitSearch() {
 }
 .mobile-link--active {
   color: #d4845c;
+}
+
+.mobile-link--child {
+  padding-left: 40px;
+}
+
+.mobile-group-label {
+  padding: 12px 24px 4px;
+  color: rgba(245, 241, 230, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .mobile-search-wrap {

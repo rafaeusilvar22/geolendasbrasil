@@ -8,6 +8,8 @@ const props = defineProps<{
   categories: Category[]
 }>()
 
+const categoryTree = computed(() => buildCategoryTree(props.categories))
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const client = useSupabaseClient<any>()
 const saving = ref(false)
@@ -266,9 +268,16 @@ async function handleSubmit() {
             <label class="field-label" for="f-category">Categoria</label>
             <select id="f-category" v-model="form.category_id" class="field-input">
               <option :value="null">Sem categoria</option>
-              <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                {{ cat.name }}
-              </option>
+              <template v-for="node in categoryTree" :key="node.id">
+                <optgroup v-if="node.children.length" :label="node.name">
+                  <option v-for="cat in node.children" :key="cat.id" :value="cat.id">
+                    {{ cat.name }}
+                  </option>
+                </optgroup>
+                <option v-else :value="node.id">
+                  {{ node.name }}
+                </option>
+              </template>
             </select>
           </div>
 

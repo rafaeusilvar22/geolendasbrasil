@@ -28,7 +28,7 @@ const allGroups = computed<CategoryGroup[]>(() => {
   })
 
   return Object.values(grouped).sort(
-    (a, b) => a.category.sort_order - b.category.sort_order,
+    (a, b) => a.category.sort_order - b.category.sort_order || a.category.id - b.category.id,
   )
 })
 

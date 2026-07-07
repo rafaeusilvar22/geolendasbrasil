@@ -6,16 +6,20 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event)
 
   const [{ data: categories }, { data: articles }] = await Promise.all([
-    client.from('categories').select('slug').order('sort_order'),
+    client.from('categories').select('*').order('sort_order'),
     client
       .from('articles')
       .select('slug, updated_at, category:categories(slug)')
       .eq('published', true),
   ])
 
+  // Parent categories never hold articles directly and aren't linked anywhere — exclude them.
+  const parentIds = new Set((categories ?? []).map((c) => c.parent_id).filter((id): id is number => id != null))
+  const assignableCategories = (categories ?? []).filter((c) => !parentIds.has(c.id))
+
   const urls: string[] = [
     `  <url><loc>${BASE}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
-    ...(categories ?? []).map(
+    ...assignableCategories.map(
       (c) => `  <url><loc>${BASE}/${c.slug}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
     ),
     ...(articles ?? [])
