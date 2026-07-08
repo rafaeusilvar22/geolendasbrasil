@@ -7,6 +7,7 @@ export interface Category {
   sort_order: number
   show_in_nav: boolean
   show_in_home: boolean
+  parent_id: number | null
   created_at: string
 }
 

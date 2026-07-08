@@ -28,12 +28,11 @@ const { data: articles } = await useAsyncData<Article[]>(`articles-${slug}`, asy
   return data ?? []
 })
 
-const SITE_URL = 'https://geolendasbrasil.netlify.app'
 const canonicalUrl = `${SITE_URL}/${slug}`
 useSeoMeta({
-  title: `${category.value!.name} — GeoLendas Brasil`,
+  title: `${category.value!.name} — ${SITE_NAME}`,
   description: category.value!.description ?? `Explore ${category.value!.name.toLowerCase()} dos estados brasileiros: histórias, tradições e cultura.`,
-  ogTitle: `${category.value!.name} — GeoLendas Brasil`,
+  ogTitle: `${category.value!.name} — ${SITE_NAME}`,
   ogDescription: category.value!.description ?? `Explore ${category.value!.name.toLowerCase()} dos estados brasileiros.`,
   ogUrl: canonicalUrl,
   ogType: 'website',
@@ -49,8 +48,8 @@ useHead({ link: [{ rel: 'canonical', href: canonicalUrl }] })
       <div
         class="category-hero-bg"
         :style="{
-          '--gradient-from': `#${category?.gradient?.[0] ?? '2D6A4F'}`,
-          '--gradient-to': `#${category?.gradient?.[1] ?? '8B6F47'}`,
+          '--gradient-from': `#${category?.gradient?.[0] ?? '151225'}`,
+          '--gradient-to': `#${category?.gradient?.[1] ?? 'C9A24B'}`,
         }"
       />
       <div class="category-hero-content">
@@ -76,7 +75,7 @@ useHead({ link: [{ rel: 'canonical', href: canonicalUrl }] })
     </div>
 
     <footer class="footer">
-      <p class="footer-text">GeoLendas Brasil © {{ new Date().getFullYear() }} | Preservando histórias, celebrando culturas</p>
+      <p class="footer-text">{{ SITE_NAME }} © {{ new Date().getFullYear() }} | Preservando histórias, celebrando culturas</p>
     </footer>
   </div>
 </template>

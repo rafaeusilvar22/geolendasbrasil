@@ -16,9 +16,8 @@ if (!VALID_TYPES.includes(quizType)) {
 const { resetQuiz } = useQuiz()
 resetQuiz()
 
-const SITE_URL = 'https://geolendasbrasil.netlify.app'
 useSeoMeta({
-  title: `Quiz: ${TITLE_MAP[quizType]} — GeoLendas Brasil`,
+  title: `Quiz: ${TITLE_MAP[quizType]} — ${SITE_NAME}`,
   description: 'Teste seus conhecimentos sobre lendas, folclore e geografia do Brasil.',
   ogUrl: `${SITE_URL}/quiz/${quizType}`,
   ogType: 'website',

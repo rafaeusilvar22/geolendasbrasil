@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import draggable from 'vuedraggable'
 import type { Category } from '~/types/article'
 
 definePageMeta({ layout: 'admin' })
@@ -12,21 +11,7 @@ const { data: categoriesData, refresh } = await useAsyncData<Category[]>('admin-
   return data ?? []
 })
 
-const localCategories = ref<Category[]>([])
-watch(categoriesData, (val) => { localCategories.value = [...(val ?? [])] }, { immediate: true })
-
-const reordering = ref(false)
-
-async function handleDragEnd() {
-  reordering.value = true
-  await Promise.all(
-    localCategories.value.map((cat, index) =>
-      client.from('categories').update({ sort_order: index }).eq('id', cat.id),
-    ),
-  )
-  reordering.value = false
-  await refresh()
-}
+const categoryTree = computed(() => buildCategoryTree(categoriesData.value ?? []))
 
 async function toggle(cat: Category, field: 'show_in_nav' | 'show_in_home') {
   await client.from('categories').update({ [field]: !cat[field] }).eq('id', cat.id)
@@ -45,45 +30,32 @@ useHead({ title: 'Navegação — Admin' })
       </div>
     </div>
 
-    <p v-if="reordering" class="reorder-status">Salvando nova ordem...</p>
-
     <!-- Desktop: tabela -->
     <div class="table-wrapper">
       <table class="table">
         <thead>
           <tr>
-            <th class="th-handle" />
             <th>Categoria</th>
             <th class="th-center">Exibir no menu</th>
             <th class="th-center">Exibir na home</th>
           </tr>
         </thead>
-        <draggable
-          v-model="localCategories"
-          tag="tbody"
-          item-key="id"
-          handle=".drag-handle"
-          :animation="150"
-          @end="handleDragEnd"
-        >
-          <template #item="{ element: cat }">
+        <tbody>
+          <template v-for="node in categoryTree" :key="node.id">
             <tr class="table-row">
-              <td class="td-handle">
-                <Icon name="lucide:grip-vertical" class="drag-handle" />
-              </td>
               <td class="td-name">
                 <div
                   class="gradient-dot"
-                  :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
+                  :style="{ '--from': `#${node.gradient[0]}`, '--to': `#${node.gradient[1]}` }"
                 />
-                {{ cat.name }}
+                {{ node.name }}
               </td>
               <td class="td-toggle">
                 <button
                   class="sw"
-                  :class="cat.show_in_nav ? 'sw--on' : 'sw--off'"
-                  :aria-label="`${cat.show_in_nav ? 'Desativar' : 'Ativar'} ${cat.name} no menu`"
-                  @click="toggle(cat, 'show_in_nav')"
+                  :class="node.show_in_nav ? 'sw--on' : 'sw--off'"
+                  :aria-label="`${node.show_in_nav ? 'Desativar' : 'Ativar'} ${node.name} no menu`"
+                  @click="toggle(node, 'show_in_nav')"
                 >
                   <span class="sw-thumb" />
                 </button>
@@ -91,51 +63,66 @@ useHead({ title: 'Navegação — Admin' })
               <td class="td-toggle">
                 <button
                   class="sw"
-                  :class="cat.show_in_home ? 'sw--on' : 'sw--off'"
-                  :aria-label="`${cat.show_in_home ? 'Desativar' : 'Ativar'} ${cat.name} na home`"
-                  @click="toggle(cat, 'show_in_home')"
+                  :class="node.show_in_home ? 'sw--on' : 'sw--off'"
+                  :disabled="node.children.length > 0"
+                  :title="node.children.length ? 'Categorias-pai não exibem artigos diretamente' : undefined"
+                  :aria-label="`${node.show_in_home ? 'Desativar' : 'Ativar'} ${node.name} na home`"
+                  @click="toggle(node, 'show_in_home')"
+                >
+                  <span class="sw-thumb" />
+                </button>
+              </td>
+            </tr>
+            <tr v-for="child in node.children" :key="child.id" class="table-row">
+              <td class="td-name td-name--child">{{ child.name }}</td>
+              <td class="td-toggle">
+                <button
+                  class="sw"
+                  :class="child.show_in_nav ? 'sw--on' : 'sw--off'"
+                  :aria-label="`${child.show_in_nav ? 'Desativar' : 'Ativar'} ${child.name} no menu`"
+                  @click="toggle(child, 'show_in_nav')"
+                >
+                  <span class="sw-thumb" />
+                </button>
+              </td>
+              <td class="td-toggle">
+                <button
+                  class="sw"
+                  :class="child.show_in_home ? 'sw--on' : 'sw--off'"
+                  :aria-label="`${child.show_in_home ? 'Desativar' : 'Ativar'} ${child.name} na home`"
+                  @click="toggle(child, 'show_in_home')"
                 >
                   <span class="sw-thumb" />
                 </button>
               </td>
             </tr>
           </template>
-          <template #footer>
-            <tr v-if="!localCategories.length">
-              <td colspan="4" class="td-empty">Nenhuma categoria cadastrada.</td>
-            </tr>
-          </template>
-        </draggable>
+          <tr v-if="!categoryTree.length">
+            <td colspan="3" class="td-empty">Nenhuma categoria cadastrada.</td>
+          </tr>
+        </tbody>
       </table>
     </div>
 
     <!-- Mobile: cards -->
-    <draggable
-      v-model="localCategories"
-      class="card-list"
-      item-key="id"
-      handle=".drag-handle"
-      :animation="150"
-      @end="handleDragEnd"
-    >
-      <template #item="{ element: cat }">
+    <div class="card-list">
+      <template v-for="node in categoryTree" :key="node.id">
         <div class="card">
           <div class="card-top">
-            <Icon name="lucide:grip-vertical" class="drag-handle" />
             <div
               class="gradient-dot"
-              :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
+              :style="{ '--from': `#${node.gradient[0]}`, '--to': `#${node.gradient[1]}` }"
             />
-            <span class="card-name">{{ cat.name }}</span>
+            <span class="card-name">{{ node.name }}</span>
           </div>
           <div class="card-toggles">
             <div class="card-toggle-row">
               <span class="card-toggle-label">Exibir no menu</span>
               <button
                 class="sw"
-                :class="cat.show_in_nav ? 'sw--on' : 'sw--off'"
-                :aria-label="`${cat.show_in_nav ? 'Desativar' : 'Ativar'} ${cat.name} no menu`"
-                @click="toggle(cat, 'show_in_nav')"
+                :class="node.show_in_nav ? 'sw--on' : 'sw--off'"
+                :aria-label="`${node.show_in_nav ? 'Desativar' : 'Ativar'} ${node.name} no menu`"
+                @click="toggle(node, 'show_in_nav')"
               >
                 <span class="sw-thumb" />
               </button>
@@ -144,20 +131,51 @@ useHead({ title: 'Navegação — Admin' })
               <span class="card-toggle-label">Exibir na home</span>
               <button
                 class="sw"
-                :class="cat.show_in_home ? 'sw--on' : 'sw--off'"
-                :aria-label="`${cat.show_in_home ? 'Desativar' : 'Ativar'} ${cat.name} na home`"
-                @click="toggle(cat, 'show_in_home')"
+                :class="node.show_in_home ? 'sw--on' : 'sw--off'"
+                :disabled="node.children.length > 0"
+                :title="node.children.length ? 'Categorias-pai não exibem artigos diretamente' : undefined"
+                :aria-label="`${node.show_in_home ? 'Desativar' : 'Ativar'} ${node.name} na home`"
+                @click="toggle(node, 'show_in_home')"
               >
                 <span class="sw-thumb" />
               </button>
             </div>
           </div>
+          <div v-if="node.children.length" class="card-children">
+            <div v-for="child in node.children" :key="child.id" class="card card--child">
+              <div class="card-top">
+                <span class="card-name">{{ child.name }}</span>
+              </div>
+              <div class="card-toggles">
+                <div class="card-toggle-row">
+                  <span class="card-toggle-label">Exibir no menu</span>
+                  <button
+                    class="sw"
+                    :class="child.show_in_nav ? 'sw--on' : 'sw--off'"
+                    :aria-label="`${child.show_in_nav ? 'Desativar' : 'Ativar'} ${child.name} no menu`"
+                    @click="toggle(child, 'show_in_nav')"
+                  >
+                    <span class="sw-thumb" />
+                  </button>
+                </div>
+                <div class="card-toggle-row">
+                  <span class="card-toggle-label">Exibir na home</span>
+                  <button
+                    class="sw"
+                    :class="child.show_in_home ? 'sw--on' : 'sw--off'"
+                    :aria-label="`${child.show_in_home ? 'Desativar' : 'Ativar'} ${child.name} na home`"
+                    @click="toggle(child, 'show_in_home')"
+                  >
+                    <span class="sw-thumb" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </template>
-      <template #footer>
-        <div v-if="!localCategories.length" class="card-empty">Nenhuma categoria cadastrada.</div>
-      </template>
-    </draggable>
+      <div v-if="!categoryTree.length" class="card-empty">Nenhuma categoria cadastrada.</div>
+    </div>
   </div>
 </template>
 
@@ -213,41 +231,9 @@ useHead({ title: 'Navegação — Admin' })
   color: var(--adm-text-muted);
 }
 
-.th-handle {
-  width: 36px;
-}
-
 .th-center {
   text-align: center;
   width: 160px;
-}
-
-.reorder-status {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  color: var(--adm-text-muted);
-  margin: 0 0 16px 0;
-}
-
-.td-handle {
-  width: 36px;
-  padding-right: 0;
-}
-
-.drag-handle {
-  width: 18px;
-  height: 18px;
-  color: var(--adm-text-faint);
-  cursor: grab;
-  display: block;
-}
-.drag-handle:active {
-  cursor: grabbing;
-}
-
-.table-row.sortable-chosen {
-  background: var(--adm-row-hover);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .table-row {
@@ -269,6 +255,12 @@ useHead({ title: 'Navegação — Admin' })
   gap: 10px;
   font-weight: 600;
   color: var(--adm-text);
+}
+
+.td-name--child {
+  padding-left: 48px;
+  font-weight: 500;
+  color: var(--adm-text-secondary);
 }
 
 .gradient-dot {
@@ -303,6 +295,10 @@ useHead({ title: 'Navegação — Admin' })
   transition: background 0.2s ease;
   overflow: hidden;
   flex-shrink: 0;
+}
+.sw:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .sw--on {
@@ -387,6 +383,19 @@ useHead({ title: 'Navegação — Admin' })
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   color: var(--adm-text-secondary);
+}
+
+.card-children {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 16px;
+  border-left: 2px solid var(--adm-row-divider);
+}
+
+.card--child {
+  box-shadow: none;
+  padding: 12px;
 }
 
 @media (max-width: 640px) {

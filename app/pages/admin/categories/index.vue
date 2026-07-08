@@ -17,10 +17,30 @@ watch(categoriesData, (val) => { localCategories.value = [...(val ?? [])] }, { i
 
 const reordering = ref(false)
 
+const topLevelCategories = computed<Category[]>({
+  get: () => localCategories.value.filter(c => c.parent_id == null).sort((a, b) => a.sort_order - b.sort_order),
+  set: (newOrder) => {
+    const children = localCategories.value.filter(c => c.parent_id != null)
+    localCategories.value = [...newOrder, ...children]
+  },
+})
+
+function childrenOf(parentId: number) {
+  return localCategories.value.filter(c => c.parent_id === parentId).sort((a, b) => a.sort_order - b.sort_order)
+}
+
+const parentOptions = computed(() =>
+  localCategories.value.filter(c => c.parent_id == null && c.id !== editingId.value),
+)
+
+const isEditingParent = computed(() =>
+  editingId.value != null && childrenOf(editingId.value).length > 0,
+)
+
 async function handleDragEnd() {
   reordering.value = true
   await Promise.all(
-    localCategories.value.map((cat, index) =>
+    topLevelCategories.value.map((cat, index) =>
       client.from('categories').update({ sort_order: index }).eq('id', cat.id),
     ),
   )
@@ -28,7 +48,24 @@ async function handleDragEnd() {
   await refresh()
 }
 
+function setChildren(parentId: number, newOrder: Category[]) {
+  const others = localCategories.value.filter(c => c.parent_id !== parentId)
+  localCategories.value = [...others, ...newOrder]
+}
+
+async function handleChildDragEnd(parentId: number) {
+  reordering.value = true
+  await Promise.all(
+    childrenOf(parentId).map((child, index) =>
+      client.from('categories').update({ sort_order: index }).eq('id', child.id),
+    ),
+  )
+  reordering.value = false
+  await refresh()
+}
+
 const modalRef = ref<HTMLDialogElement>()
+const confirmDialogRef = ref<InstanceType<typeof AdminConfirmDialog>>()
 const editingId = ref<number | null>(null)
 const saving = ref(false)
 const error = ref('')
@@ -37,8 +74,9 @@ const form = reactive({
   name: '',
   slug: '',
   description: '',
-  gradient_from: '2D6A4F',
-  gradient_to: 'D4845C',
+  gradient_from: '151225',
+  gradient_to: 'C9A24B',
+  parent_id: null as number | null,
 })
 
 watch(() => form.name, (val) => {
@@ -51,10 +89,10 @@ watch(() => form.name, (val) => {
     .replace(/^-|-$/g, '')
 })
 
-function openCreate() {
+function openCreate(parentId: number | null = null) {
   editingId.value = null
   error.value = ''
-  Object.assign(form, { name: '', slug: '', description: '', gradient_from: '2D6A4F', gradient_to: 'D4845C' })
+  Object.assign(form, { name: '', slug: '', description: '', gradient_from: '151225', gradient_to: 'C9A24B', parent_id: parentId })
   modalRef.value?.showModal()
 }
 
@@ -65,8 +103,9 @@ function openEdit(cat: Category) {
     name: cat.name,
     slug: cat.slug,
     description: cat.description ?? '',
-    gradient_from: cat.gradient[0] ?? '2D6A4F',
-    gradient_to: cat.gradient[1] ?? 'D4845C',
+    gradient_from: cat.gradient[0] ?? '151225',
+    gradient_to: cat.gradient[1] ?? 'C9A24B',
+    parent_id: cat.parent_id,
   })
   modalRef.value?.showModal()
 }
@@ -89,9 +128,10 @@ async function handleSubmit() {
     slug: form.slug,
     description: form.description || null,
     gradient: [form.gradient_from, form.gradient_to],
+    parent_id: form.parent_id,
     sort_order: editingId.value
       ? localCategories.value.find(c => c.id === editingId.value)?.sort_order ?? 0
-      : localCategories.value.length,
+      : localCategories.value.filter(c => c.parent_id === form.parent_id).length,
   }
 
   let dbError
@@ -115,7 +155,12 @@ async function handleSubmit() {
 }
 
 async function deleteCategory(cat: Category) {
-  if (!confirm(`Excluir a categoria "${cat.name}"?`)) return
+  const childCount = childrenOf(cat.id).length
+  const message = childCount > 0
+    ? `Excluir a categoria "${cat.name}"? As ${childCount} subcategorias serão promovidas a categorias de nível superior.`
+    : `Excluir a categoria "${cat.name}"?`
+  const confirmed = await confirmDialogRef.value?.open({ title: 'Excluir categoria', message })
+  if (!confirmed) return
   await client.from('categories').delete().eq('id', cat.id)
   await refresh()
 }
@@ -125,73 +170,117 @@ async function deleteCategory(cat: Category) {
   <div class="page">
     <div class="page-header">
       <h1 class="page-title">Categorias</h1>
-      <button class="btn-new" @click="openCreate">+ Nova categoria</button>
+      <button class="btn-new" @click="openCreate()">+ Nova categoria</button>
     </div>
 
     <p v-if="reordering" class="reorder-status">Salvando nova ordem...</p>
 
     <!-- Desktop: tabela -->
     <div class="table-wrapper">
-      <table class="table">
-        <thead>
-          <tr>
-            <th class="th-handle" />
-            <th>Nome</th>
-            <th>Slug</th>
-            <th>Descrição</th>
-            <th></th>
-          </tr>
-        </thead>
-        <draggable
-          v-model="localCategories"
-          tag="tbody"
-          item-key="id"
-          handle=".drag-handle"
-          :animation="150"
-          @end="handleDragEnd"
-        >
-          <template #item="{ element: cat }">
-            <tr class="table-row">
-              <td class="td-handle">
-                <Icon name="lucide:grip-vertical" class="drag-handle" />
-              </td>
-              <td class="td-name">
-                <div
-                  class="gradient-dot"
-                  :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
-                />
-                {{ cat.name }}
-              </td>
-              <td class="td-slug">{{ cat.slug }}</td>
-              <td class="td-desc">{{ cat.description ?? '—' }}</td>
-              <td class="td-actions">
-                <button class="action-edit" @click="openEdit(cat)">Editar</button>
-                <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
-              </td>
+      <draggable
+        v-model="topLevelCategories"
+        tag="table"
+        class="table"
+        item-key="id"
+        handle=".drag-handle--parent"
+        :animation="150"
+        @end="handleDragEnd"
+      >
+        <template #header>
+          <thead>
+            <tr>
+              <th class="th-handle" />
+              <th>Nome</th>
+              <th>Slug</th>
+              <th>Descrição</th>
+              <th></th>
             </tr>
-          </template>
-          <template #footer>
-            <tr v-if="!localCategories.length">
+          </thead>
+        </template>
+
+        <template #item="{ element: cat }">
+          <draggable
+            :model-value="childrenOf(cat.id)"
+            tag="tbody"
+            class="category-group"
+            item-key="id"
+            handle=".drag-handle--child"
+            :animation="150"
+            @update:model-value="(val: Category[]) => setChildren(cat.id, val)"
+            @end="handleChildDragEnd(cat.id)"
+          >
+            <template #header>
+              <tr class="table-row table-row--parent">
+                <td class="td-handle">
+                  <Icon name="lucide:grip-vertical" class="drag-handle drag-handle--parent" />
+                </td>
+                <td class="td-name">
+                  <div class="td-name-main">
+                    <div
+                      class="gradient-dot"
+                      :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
+                    />
+                    {{ cat.name }}
+                  </div>
+                </td>
+                <td class="td-slug">{{ cat.slug }}</td>
+                <td class="td-desc">{{ cat.description ?? '—' }}</td>
+                <td class="td-actions">
+                  <button class="action-edit" @click="openEdit(cat)">Editar</button>
+                  <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
+                </td>
+              </tr>
+            </template>
+
+            <template #item="{ element: child }">
+              <tr class="table-row table-row--child">
+                <td class="td-handle">
+                  <Icon name="lucide:grip-vertical" class="drag-handle drag-handle--child" />
+                </td>
+                <td class="td-name">{{ child.name }}</td>
+                <td class="td-slug">{{ child.slug }}</td>
+                <td class="td-desc">{{ child.description ?? '—' }}</td>
+                <td class="td-actions">
+                  <button class="action-edit" @click="openEdit(child)">Editar</button>
+                  <button class="action-delete" @click="deleteCategory(child)">Excluir</button>
+                </td>
+              </tr>
+            </template>
+
+            <template #footer>
+              <tr class="table-row table-row--new-sub">
+                <td />
+                <td colspan="4">
+                  <button class="btn-new-sub" @click="openCreate(cat.id)">+ Nova subcategoria</button>
+                </td>
+              </tr>
+            </template>
+          </draggable>
+        </template>
+
+        <template #footer>
+          <tbody v-if="!localCategories.length">
+            <tr>
               <td colspan="5" class="td-empty">Nenhuma categoria cadastrada.</td>
             </tr>
-          </template>
-        </draggable>
-      </table>
+          </tbody>
+        </template>
+      </draggable>
     </div>
 
     <!-- Mobile: cards -->
     <draggable
-      v-model="localCategories"
+      v-model="topLevelCategories"
       class="card-list"
       item-key="id"
-      handle=".drag-handle"
+      handle=".drag-handle--parent"
       :animation="150"
       @end="handleDragEnd"
     >
       <template #item="{ element: cat }">
         <div class="card">
           <div class="card-top">
-            <Icon name="lucide:grip-vertical" class="drag-handle" />
+            <Icon name="lucide:grip-vertical" class="drag-handle drag-handle--parent" />
             <div
               class="gradient-dot"
               :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
@@ -204,6 +293,31 @@ async function deleteCategory(cat: Category) {
             <button class="action-edit" @click="openEdit(cat)">Editar</button>
             <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
           </div>
+          <draggable
+            v-if="childrenOf(cat.id).length"
+            :model-value="childrenOf(cat.id)"
+            tag="div"
+            class="children-list children-list--card"
+            item-key="id"
+            handle=".drag-handle--child"
+            :animation="150"
+            @update:model-value="(val: Category[]) => setChildren(cat.id, val)"
+            @end="handleChildDragEnd(cat.id)"
+          >
+            <template #item="{ element: child }">
+              <div class="child-row">
+                <div class="child-row-main">
+                  <Icon name="lucide:grip-vertical" class="drag-handle drag-handle--child" />
+                  <span class="child-name">{{ child.name }}</span>
+                </div>
+                <div class="child-actions">
+                  <button class="action-edit" @click="openEdit(child)">Editar</button>
+                  <button class="action-delete" @click="deleteCategory(child)">Excluir</button>
+                </div>
+              </div>
+            </template>
+          </draggable>
+          <button class="btn-new-sub" @click="openCreate(cat.id)">+ Nova subcategoria</button>
         </div>
       </template>
       <template #footer>
@@ -228,6 +342,15 @@ async function deleteCategory(cat: Category) {
             <span class="field-hint">Apenas letras, números e hífens.</span>
           </div>
 
+          <div v-if="!isEditingParent" class="field">
+            <label class="field-label" for="m-parent">Categoria pai</label>
+            <select id="m-parent" v-model="form.parent_id" class="field-input">
+              <option :value="null">Nenhuma (categoria de nível superior)</option>
+              <option v-for="p in parentOptions" :key="p.id" :value="p.id">{{ p.name }}</option>
+            </select>
+            <span class="field-hint">Escolha uma categoria pai para transformar esta em subcategoria.</span>
+          </div>
+
           <div class="field">
             <label class="field-label" for="m-desc">Descrição</label>
             <textarea id="m-desc" v-model="form.description" class="field-input field-textarea" rows="2" placeholder="Descrição curta da categoria" />
@@ -238,11 +361,11 @@ async function deleteCategory(cat: Category) {
             <div class="gradient-row">
               <div class="gradient-input-group">
                 <span class="field-sublabel">Cor inicial (hex sem #)</span>
-                <input v-model="form.gradient_from" class="field-input" type="text" maxlength="6" placeholder="2D6A4F" />
+                <input v-model="form.gradient_from" class="field-input" type="text" maxlength="6" placeholder="151225" />
               </div>
               <div class="gradient-input-group">
                 <span class="field-sublabel">Cor final (hex sem #)</span>
-                <input v-model="form.gradient_to" class="field-input" type="text" maxlength="6" placeholder="D4845C" />
+                <input v-model="form.gradient_to" class="field-input" type="text" maxlength="6" placeholder="C9A24B" />
               </div>
               <div
                 class="gradient-preview"
@@ -266,6 +389,8 @@ async function deleteCategory(cat: Category) {
         <button>close</button>
       </form>
     </dialog>
+
+    <AdminConfirmDialog ref="confirmDialogRef" />
   </div>
 </template>
 
@@ -292,7 +417,7 @@ async function deleteCategory(cat: Category) {
 .btn-new {
   padding: 10px 20px;
   background: var(--adm-accent);
-  color: #f5f1e6;
+  color: #D8D2E6;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -349,10 +474,79 @@ async function deleteCategory(cat: Category) {
 }
 
 .td-name {
+  font-weight: 600;
+}
+
+.td-name-main {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.table-row--child .td-name {
+  padding-left: 44px;
+  font-weight: 500;
+  color: var(--adm-text-secondary);
+}
+
+.table-row--parent {
+  border-top: 2px solid var(--adm-border);
+}
+
+.table-row--new-sub td {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.children-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.children-list--card {
+  padding-left: 20px;
+  padding-top: 4px;
+  border-top: 1px solid var(--adm-row-divider);
+}
+
+.child-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.child-row-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.child-name {
+  color: var(--adm-text-secondary);
+}
+
+.child-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-new-sub {
+  background: none;
+  border: none;
+  color: var(--adm-accent);
+  font-size: 12px;
   font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+.btn-new-sub:hover {
+  text-decoration: underline;
 }
 
 .gradient-dot {
@@ -381,6 +575,10 @@ async function deleteCategory(cat: Category) {
 }
 .drag-handle:active {
   cursor: grabbing;
+}
+.drag-handle--child {
+  width: 15px;
+  height: 15px;
 }
 
 .table-row.sortable-chosen {
@@ -435,7 +633,7 @@ async function deleteCategory(cat: Category) {
 .action-delete {
   background: none;
   border: none;
-  color: #c9724a;
+  color: #7C2D3B;
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
@@ -565,7 +763,7 @@ async function deleteCategory(cat: Category) {
 }
 .field-input:focus {
   border-color: var(--adm-accent);
-  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+  box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.1);
 }
 .field-textarea {
   resize: vertical;
@@ -599,12 +797,12 @@ async function deleteCategory(cat: Category) {
 
 .error-msg {
   font-size: 13px;
-  color: #c9724a;
+  color: #7C2D3B;
   margin: 0;
   padding: 10px 14px;
-  background: rgba(201, 114, 74, 0.08);
+  background: rgba(124, 45, 59, 0.08);
   border-radius: 6px;
-  border-left: 3px solid #c9724a;
+  border-left: 3px solid #7C2D3B;
   font-family: 'Inter', sans-serif;
 }
 
@@ -635,7 +833,7 @@ async function deleteCategory(cat: Category) {
 .btn-save {
   padding: 10px 24px;
   background: var(--adm-accent);
-  color: #f5f1e6;
+  color: #D8D2E6;
   border: none;
   border-radius: 8px;
   font-size: 14px;

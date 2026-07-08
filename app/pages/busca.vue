@@ -31,9 +31,8 @@ function refineSearch() {
   router.push({ path: '/busca', query: { q: term } })
 }
 
-const SITE_URL = 'https://geolendasbrasil.netlify.app'
 useSeoMeta({
-  title: q.value ? `Busca: "${q.value}" — GeoLendas Brasil` : 'Busca — GeoLendas Brasil',
+  title: q.value ? `Busca: "${q.value}" — ${SITE_NAME}` : `Busca — ${SITE_NAME}`,
   description: 'Pesquise artigos sobre história, lendas e cultura dos estados brasileiros.',
   ogUrl: `${SITE_URL}/busca`,
 })
@@ -97,7 +96,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/busca` }] })
     </div>
 
     <footer class="footer">
-      <p class="footer-text">GeoLendas Brasil © {{ new Date().getFullYear() }} | Preservando histórias, celebrando culturas</p>
+      <p class="footer-text">{{ SITE_NAME }} © {{ new Date().getFullYear() }} | Preservando histórias, celebrando culturas</p>
     </footer>
   </div>
 </template>
@@ -170,13 +169,13 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/busca` }] })
   color: var(--pg-text-muted);
 }
 .search-input:focus {
-  border-color: #d4845c;
+  border-color: #C9A24B;
 }
 
 .search-btn {
   height: 48px;
   padding: 0 24px;
-  background: #d4845c;
+  background: #C9A24B;
   border: none;
   border-radius: 8px;
   color: #fff;
@@ -188,7 +187,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/busca` }] })
   transition: background 0.2s ease;
 }
 .search-btn:hover {
-  background: #c0714a;
+  background: #A67F32;
 }
 
 .content {
@@ -248,7 +247,7 @@ useHead({ link: [{ rel: 'canonical', href: `${SITE_URL}/busca` }] })
 .back-link {
   display: inline-block;
   margin-top: 8px;
-  color: #d4845c;
+  color: #C9A24B;
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;

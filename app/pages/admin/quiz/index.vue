@@ -82,8 +82,14 @@ async function toggleActive(question: AdminQuizQuestion) {
   await refresh()
 }
 
+const confirmDialogRef = ref<InstanceType<typeof AdminConfirmDialog>>()
+
 async function deleteQuestion(question: AdminQuizQuestion) {
-  if (!confirm(`Excluir a pergunta "${question.question}"?`)) return
+  const confirmed = await confirmDialogRef.value?.open({
+    title: 'Excluir pergunta',
+    message: `Excluir a pergunta "${question.question}"?`,
+  })
+  if (!confirmed) return
   await client.from('quiz_questions').delete().eq('id', question.id)
   if (questions.value.length === 1 && page.value > 1) page.value--
   else await refresh()
@@ -215,6 +221,8 @@ function formattedDate(str: string) {
       </span>
       <button class="page-btn" :disabled="page === totalPages" @click="page++">Próxima →</button>
     </div>
+
+    <AdminConfirmDialog ref="confirmDialogRef" />
   </div>
 </template>
 
@@ -241,7 +249,7 @@ function formattedDate(str: string) {
 .btn-new {
   padding: 10px 20px;
   background: var(--adm-accent);
-  color: #f5f1e6;
+  color: #D8D2E6;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
@@ -444,11 +452,11 @@ function formattedDate(str: string) {
   opacity: 0.8;
 }
 .status-badge--published {
-  background: rgba(45, 106, 79, 0.12);
+  background: rgba(201, 162, 75, 0.12);
   color: var(--adm-accent);
 }
 .status-badge--draft {
-  background: rgba(139, 111, 71, 0.12);
+  background: rgba(122, 106, 82, 0.12);
   color: var(--adm-text-muted);
 }
 
@@ -471,7 +479,7 @@ function formattedDate(str: string) {
 .action-delete {
   background: none;
   border: none;
-  color: #c9724a;
+  color: #7C2D3B;
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;

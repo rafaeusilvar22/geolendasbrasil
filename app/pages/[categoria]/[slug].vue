@@ -66,7 +66,6 @@ async function copyLink() {
   setTimeout(() => { copySuccess.value = false }, 2000)
 }
 
-const SITE_URL = 'https://geolendasbrasil.netlify.app'
 const canonicalUrl = `${SITE_URL}/${catSlug}/${artSlug}`
 
 const ogDescription = article.value!.excerpt.length > 120
@@ -81,7 +80,7 @@ defineOgImage('ArticleCard', {
 })
 
 useSeoMeta({
-  title: `${article.value!.title} — GeoLendas Brasil`,
+  title: `${article.value!.title} — ${SITE_NAME}`,
   description: article.value!.excerpt,
   ogTitle: article.value!.title,
   ogDescription: article.value!.excerpt,
@@ -106,7 +105,7 @@ useHead({
       inLanguage: 'pt-BR',
       publisher: {
         '@type': 'Organization',
-        name: 'GeoLendas Brasil',
+        name: SITE_NAME,
         url: SITE_URL,
       },
     }),
@@ -258,7 +257,7 @@ function openPlayer() {
         <div v-if="isImmersive" class="immersive-overlay">
           <div class="immersive-topbar">
             <div class="immersive-progress-bar" :style="{ width: readingProgress + '%' }" />
-            <span class="immersive-logo">GeoLendas Brasil</span>
+            <span class="immersive-logo">{{ SITE_NAME }}</span>
             <div class="immersive-controls">
               <button class="immersive-ctrl" title="Diminuir fonte" @click="decreaseFontSize">A−</button>
               <span class="immersive-font-size">{{ immersiveFontSize }}</span>
@@ -351,9 +350,9 @@ function openPlayer() {
 }
 
 .meta-badge--type {
-  background: rgba(212, 132, 92, 0.25);
-  border-color: rgba(212, 132, 92, 0.45);
-  color: #e8a87c;
+  background: rgba(201, 162, 75, 0.25);
+  border-color: rgba(201, 162, 75, 0.45);
+  color: #E3C077;
 }
 
 .article-title {
@@ -533,7 +532,7 @@ function openPlayer() {
   height: 20px;
 }
 
-[data-theme="forest"] .share-btn img[alt="X"] {
+[data-theme="penumbra"] .share-btn img[alt="X"] {
   filter: invert(1);
 }
 
@@ -574,20 +573,20 @@ function openPlayer() {
   align-items: center;
   gap: 7px;
   padding: 10px 20px;
-  background: var(--pg-accent, #2D6A4F);
+  background: var(--pg-accent, #C9A24B);
   border: none;
   border-radius: 24px;
-  color: #f5f1e6;
+  color: #D8D2E6;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(45, 106, 79, 0.4);
+  box-shadow: 0 4px 20px rgba(201, 162, 75, 0.4);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .audio-fab:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 28px rgba(45, 106, 79, 0.55);
+  box-shadow: 0 6px 28px rgba(201, 162, 75, 0.55);
 }
 
 /* Wrapper do excerpt + botão imersivo inline */
@@ -604,7 +603,7 @@ function openPlayer() {
   margin-bottom: 14px;
   padding: 6px 14px;
   background: transparent;
-  border: 1px solid rgba(200, 149, 107, 0.25);
+  border: 1px solid rgba(201, 162, 75, 0.25);
   border-radius: 20px;
   color: var(--pg-text-muted);
   font-family: 'Inter', sans-serif;
@@ -614,9 +613,9 @@ function openPlayer() {
   transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 .immersive-inline-btn:hover {
-  border-color: rgba(200, 149, 107, 0.65);
-  color: #c8956b;
-  background: rgba(200, 149, 107, 0.06);
+  border-color: rgba(201, 162, 75, 0.65);
+  color: #C9A24B;
+  background: rgba(201, 162, 75, 0.06);
 }
 
 
@@ -635,7 +634,7 @@ function openPlayer() {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #0e0b08;
+  background: #0E0C18;
   display: flex;
   flex-direction: column;
 }
@@ -647,8 +646,8 @@ function openPlayer() {
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  background: rgba(14, 11, 8, 0.97);
-  border-bottom: 1px solid rgba(192, 168, 130, 0.08);
+  background: rgba(14, 12, 24, 0.97);
+  border-bottom: 1px solid rgba(140, 132, 163, 0.08);
   position: relative;
 }
 
@@ -657,7 +656,7 @@ function openPlayer() {
   top: 0;
   left: 0;
   height: 2px;
-  background: #c8956b;
+  background: #C9A24B;
   transition: width 0.15s linear;
   border-radius: 0 2px 2px 0;
 }
@@ -665,7 +664,7 @@ function openPlayer() {
 .immersive-logo {
   font-family: 'Merriweather', serif;
   font-size: 13px;
-  color: rgba(192, 168, 130, 0.45);
+  color: rgba(140, 132, 163, 0.45);
   letter-spacing: 0.3px;
 }
 
@@ -677,9 +676,9 @@ function openPlayer() {
 
 .immersive-ctrl {
   background: transparent;
-  border: 1px solid rgba(192, 168, 130, 0.15);
+  border: 1px solid rgba(140, 132, 163, 0.15);
   border-radius: 8px;
-  color: rgba(192, 168, 130, 0.6);
+  color: rgba(140, 132, 163, 0.6);
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 600;
@@ -689,22 +688,22 @@ function openPlayer() {
   line-height: 1;
 }
 .immersive-ctrl:hover {
-  background: rgba(200, 149, 107, 0.12);
-  border-color: rgba(200, 149, 107, 0.4);
-  color: #c8956b;
+  background: rgba(201, 162, 75, 0.12);
+  border-color: rgba(201, 162, 75, 0.4);
+  color: #C9A24B;
 }
 
 .immersive-font-size {
   font-family: 'Inter', sans-serif;
   font-size: 11px;
-  color: rgba(192, 168, 130, 0.35);
+  color: rgba(140, 132, 163, 0.35);
   min-width: 22px;
   text-align: center;
 }
 
 .immersive-close {
   margin-left: 8px;
-  border-color: rgba(192, 168, 130, 0.2);
+  border-color: rgba(140, 132, 163, 0.2);
   font-size: 14px;
   padding: 5px 9px;
 }
@@ -722,11 +721,11 @@ function openPlayer() {
   background: transparent;
 }
 .immersive-scroll::-webkit-scrollbar-thumb {
-  background: rgba(200, 149, 107, 0.25);
+  background: rgba(201, 162, 75, 0.25);
   border-radius: 3px;
 }
 .immersive-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(200, 149, 107, 0.45);
+  background: rgba(201, 162, 75, 0.45);
 }
 
 .immersive-inner {
@@ -744,33 +743,33 @@ function openPlayer() {
 .immersive-badge {
   display: inline-block;
   padding: 4px 12px;
-  background: rgba(192, 168, 130, 0.08);
-  border: 1px solid rgba(192, 168, 130, 0.2);
+  background: rgba(140, 132, 163, 0.08);
+  border: 1px solid rgba(140, 132, 163, 0.2);
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: rgba(192, 168, 130, 0.65);
+  color: rgba(140, 132, 163, 0.65);
 }
 .immersive-badge--type {
-  background: rgba(200, 149, 107, 0.1);
-  border-color: rgba(200, 149, 107, 0.3);
-  color: rgba(200, 149, 107, 0.8);
+  background: rgba(201, 162, 75, 0.1);
+  border-color: rgba(201, 162, 75, 0.3);
+  color: rgba(201, 162, 75, 0.8);
 }
 
 .immersive-title {
   font-family: 'Merriweather', serif;
   font-size: 40px;
   font-weight: 700;
-  color: #ede3d4;
+  color: #E3C077;
   line-height: 1.25;
   margin: 0 0 16px 0;
 }
 
 .immersive-date {
   font-size: 13px;
-  color: rgba(192, 168, 130, 0.4);
+  color: rgba(140, 132, 163, 0.4);
   margin: 0 0 44px 0;
   font-family: 'Inter', sans-serif;
 }
@@ -779,15 +778,15 @@ function openPlayer() {
   font-family: 'Merriweather', serif;
   font-style: italic;
   font-size: 19px;
-  color: #d4c0a0;
+  color: #E3C077;
   line-height: 1.8;
   margin-bottom: 44px;
   padding-bottom: 36px;
-  border-bottom: 1px solid rgba(192, 168, 130, 0.12);
+  border-bottom: 1px solid rgba(140, 132, 163, 0.12);
 }
 
 .immersive-body {
-  color: #b8a48a;
+  color: #D8D2E6;
   line-height: 1.95;
   font-family: 'Merriweather', serif;
 }
@@ -799,7 +798,7 @@ function openPlayer() {
   font-family: 'Merriweather', serif;
   font-size: 26px;
   font-weight: 700;
-  color: #ddd0be;
+  color: #E3C077;
   margin: 2.2em 0 0.7em 0;
   line-height: 1.3;
 }
@@ -807,7 +806,7 @@ function openPlayer() {
   font-family: 'Merriweather', serif;
   font-size: 20px;
   font-weight: 700;
-  color: #cfc3ae;
+  color: #C9A24B;
   margin: 1.8em 0 0.5em 0;
   line-height: 1.3;
 }
@@ -820,16 +819,16 @@ function openPlayer() {
   margin-bottom: 0.45em;
 }
 .immersive-body :deep(blockquote) {
-  border-left: 3px solid #c8956b;
+  border-left: 3px solid #C9A24B;
   padding: 12px 20px;
   margin: 1.75em 0;
-  background: rgba(200, 149, 107, 0.07);
+  background: rgba(201, 162, 75, 0.07);
   border-radius: 0 8px 8px 0;
-  color: #c4ad8e;
+  color: #8C84A3;
   font-style: italic;
 }
 .immersive-body :deep(a) {
-  color: #c8956b;
+  color: #C9A24B;
   text-decoration: underline;
 }
 .immersive-body :deep(img) {
@@ -841,7 +840,7 @@ function openPlayer() {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 .immersive-body :deep(strong) {
-  color: #e0d0b8;
+  color: #E3C077;
   font-weight: 700;
 }
 
@@ -855,15 +854,15 @@ function openPlayer() {
 
 .immersive-end-mark {
   font-size: 14px;
-  color: rgba(200, 149, 107, 0.35);
+  color: rgba(201, 162, 75, 0.35);
   letter-spacing: 8px;
 }
 
 .immersive-exit-btn {
   background: transparent;
-  border: 1px solid rgba(200, 149, 107, 0.3);
+  border: 1px solid rgba(201, 162, 75, 0.3);
   border-radius: 24px;
-  color: rgba(200, 149, 107, 0.7);
+  color: rgba(201, 162, 75, 0.7);
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 500;
@@ -872,9 +871,9 @@ function openPlayer() {
   transition: all 0.2s ease;
 }
 .immersive-exit-btn:hover {
-  background: rgba(200, 149, 107, 0.1);
-  border-color: rgba(200, 149, 107, 0.6);
-  color: #c8956b;
+  background: rgba(201, 162, 75, 0.1);
+  border-color: rgba(201, 162, 75, 0.6);
+  color: #C9A24B;
 }
 
 @media (max-width: 640px) {
