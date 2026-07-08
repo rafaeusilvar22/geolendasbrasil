@@ -65,6 +65,7 @@ async function handleChildDragEnd(parentId: number) {
 }
 
 const modalRef = ref<HTMLDialogElement>()
+const confirmDialogRef = ref<InstanceType<typeof AdminConfirmDialog>>()
 const editingId = ref<number | null>(null)
 const saving = ref(false)
 const error = ref('')
@@ -158,7 +159,8 @@ async function deleteCategory(cat: Category) {
   const message = childCount > 0
     ? `Excluir a categoria "${cat.name}"? As ${childCount} subcategorias serão promovidas a categorias de nível superior.`
     : `Excluir a categoria "${cat.name}"?`
-  if (!confirm(message)) return
+  const confirmed = await confirmDialogRef.value?.open({ title: 'Excluir categoria', message })
+  if (!confirmed) return
   await client.from('categories').delete().eq('id', cat.id)
   await refresh()
 }
@@ -387,6 +389,8 @@ async function deleteCategory(cat: Category) {
         <button>close</button>
       </form>
     </dialog>
+
+    <AdminConfirmDialog ref="confirmDialogRef" />
   </div>
 </template>
 
@@ -486,12 +490,7 @@ async function deleteCategory(cat: Category) {
 }
 
 .table-row--parent {
-  background: var(--adm-surface-alt);
   border-top: 2px solid var(--adm-border);
-}
-
-.table-row--child:nth-of-type(even) {
-  background: var(--adm-surface-alt);
 }
 
 .table-row--new-sub td {

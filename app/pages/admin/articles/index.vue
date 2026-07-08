@@ -70,8 +70,14 @@ async function togglePublished(article: Article) {
   await refresh()
 }
 
+const confirmDialogRef = ref<InstanceType<typeof AdminConfirmDialog>>()
+
 async function deleteArticle(article: Article) {
-  if (!confirm(`Excluir o artigo "${article.title}"?`)) return
+  const confirmed = await confirmDialogRef.value?.open({
+    title: 'Excluir artigo',
+    message: `Excluir o artigo "${article.title}"?`,
+  })
+  if (!confirmed) return
   await client.from('articles').delete().eq('id', article.id)
   if (articles.value.length === 1 && page.value > 1) page.value--
   else await refresh()
@@ -197,6 +203,8 @@ function formattedDate(str: string) {
       </span>
       <button class="page-btn" :disabled="page === totalPages" @click="page++">Próxima →</button>
     </div>
+
+    <AdminConfirmDialog ref="confirmDialogRef" />
   </div>
 </template>
 

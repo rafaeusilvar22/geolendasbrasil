@@ -82,8 +82,14 @@ async function toggleActive(question: AdminQuizQuestion) {
   await refresh()
 }
 
+const confirmDialogRef = ref<InstanceType<typeof AdminConfirmDialog>>()
+
 async function deleteQuestion(question: AdminQuizQuestion) {
-  if (!confirm(`Excluir a pergunta "${question.question}"?`)) return
+  const confirmed = await confirmDialogRef.value?.open({
+    title: 'Excluir pergunta',
+    message: `Excluir a pergunta "${question.question}"?`,
+  })
+  if (!confirmed) return
   await client.from('quiz_questions').delete().eq('id', question.id)
   if (questions.value.length === 1 && page.value > 1) page.value--
   else await refresh()
@@ -215,6 +221,8 @@ function formattedDate(str: string) {
       </span>
       <button class="page-btn" :disabled="page === totalPages" @click="page++">Próxima →</button>
     </div>
+
+    <AdminConfirmDialog ref="confirmDialogRef" />
   </div>
 </template>
 
