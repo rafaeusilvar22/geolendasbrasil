@@ -44,20 +44,18 @@ async function handleDragEnd() {
   await refresh()
 }
 
-async function moveChild(child: Category, direction: 'up' | 'down') {
-  if (child.parent_id == null) return
-  const siblings = childrenOf(child.parent_id)
-  const idx = siblings.findIndex(c => c.id === child.id)
-  const swapIdx = direction === 'up' ? idx - 1 : idx + 1
-  if (swapIdx < 0 || swapIdx >= siblings.length) return
-  const other = siblings[swapIdx]
-  if (!other) return
+function setChildren(parentId: number, newOrder: Category[]) {
+  const others = localCategories.value.filter(c => c.parent_id !== parentId)
+  localCategories.value = [...others, ...newOrder]
+}
 
+async function handleChildDragEnd(parentId: number) {
   reordering.value = true
-  await Promise.all([
-    client.from('categories').update({ sort_order: other.sort_order }).eq('id', child.id),
-    client.from('categories').update({ sort_order: child.sort_order }).eq('id', other.id),
-  ])
+  await Promise.all(
+    childrenOf(parentId).map((child, index) =>
+      client.from('categories').update({ sort_order: index }).eq('id', child.id),
+    ),
+  )
   reordering.value = false
   await refresh()
 }
@@ -173,65 +171,95 @@ async function deleteCategory(cat: Category) {
 
     <!-- Desktop: tabela -->
     <div class="table-wrapper">
-      <table class="table">
-        <thead>
-          <tr>
-            <th class="th-handle" />
-            <th>Nome</th>
-            <th>Slug</th>
-            <th>Descrição</th>
-            <th></th>
-          </tr>
-        </thead>
-        <draggable
-          v-model="topLevelCategories"
-          tag="tbody"
-          item-key="id"
-          handle=".drag-handle"
-          :animation="150"
-          @end="handleDragEnd"
-        >
-          <template #item="{ element: cat }">
-            <tr class="table-row">
-              <td class="td-handle">
-                <Icon name="lucide:grip-vertical" class="drag-handle" />
-              </td>
-              <td class="td-name">
-                <div class="td-name-main">
-                  <div
-                    class="gradient-dot"
-                    :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
-                  />
-                  {{ cat.name }}
-                </div>
-                <div v-if="childrenOf(cat.id).length" class="children-list">
-                  <div v-for="(child, idx) in childrenOf(cat.id)" :key="child.id" class="child-row">
-                    <span class="child-name">{{ child.name }}</span>
-                    <div class="child-actions">
-                      <button class="arrow-btn" :disabled="idx === 0" @click="moveChild(child, 'up')">↑</button>
-                      <button class="arrow-btn" :disabled="idx === childrenOf(cat.id).length - 1" @click="moveChild(child, 'down')">↓</button>
-                      <button class="action-edit" @click="openEdit(child)">Editar</button>
-                      <button class="action-delete" @click="deleteCategory(child)">Excluir</button>
-                    </div>
-                  </div>
-                </div>
-                <button class="btn-new-sub" @click="openCreate(cat.id)">+ Nova subcategoria</button>
-              </td>
-              <td class="td-slug">{{ cat.slug }}</td>
-              <td class="td-desc">{{ cat.description ?? '—' }}</td>
-              <td class="td-actions">
-                <button class="action-edit" @click="openEdit(cat)">Editar</button>
-                <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
-              </td>
+      <draggable
+        v-model="topLevelCategories"
+        tag="table"
+        class="table"
+        item-key="id"
+        handle=".drag-handle--parent"
+        :animation="150"
+        @end="handleDragEnd"
+      >
+        <template #header>
+          <thead>
+            <tr>
+              <th class="th-handle" />
+              <th>Nome</th>
+              <th>Slug</th>
+              <th>Descrição</th>
+              <th></th>
             </tr>
-          </template>
-          <template #footer>
-            <tr v-if="!localCategories.length">
+          </thead>
+        </template>
+
+        <template #item="{ element: cat }">
+          <draggable
+            :model-value="childrenOf(cat.id)"
+            tag="tbody"
+            class="category-group"
+            item-key="id"
+            handle=".drag-handle--child"
+            :animation="150"
+            @update:model-value="(val: Category[]) => setChildren(cat.id, val)"
+            @end="handleChildDragEnd(cat.id)"
+          >
+            <template #header>
+              <tr class="table-row table-row--parent">
+                <td class="td-handle">
+                  <Icon name="lucide:grip-vertical" class="drag-handle drag-handle--parent" />
+                </td>
+                <td class="td-name">
+                  <div class="td-name-main">
+                    <div
+                      class="gradient-dot"
+                      :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
+                    />
+                    {{ cat.name }}
+                  </div>
+                </td>
+                <td class="td-slug">{{ cat.slug }}</td>
+                <td class="td-desc">{{ cat.description ?? '—' }}</td>
+                <td class="td-actions">
+                  <button class="action-edit" @click="openEdit(cat)">Editar</button>
+                  <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
+                </td>
+              </tr>
+            </template>
+
+            <template #item="{ element: child }">
+              <tr class="table-row table-row--child">
+                <td class="td-handle">
+                  <Icon name="lucide:grip-vertical" class="drag-handle drag-handle--child" />
+                </td>
+                <td class="td-name">{{ child.name }}</td>
+                <td class="td-slug">{{ child.slug }}</td>
+                <td class="td-desc">{{ child.description ?? '—' }}</td>
+                <td class="td-actions">
+                  <button class="action-edit" @click="openEdit(child)">Editar</button>
+                  <button class="action-delete" @click="deleteCategory(child)">Excluir</button>
+                </td>
+              </tr>
+            </template>
+
+            <template #footer>
+              <tr class="table-row table-row--new-sub">
+                <td />
+                <td colspan="4">
+                  <button class="btn-new-sub" @click="openCreate(cat.id)">+ Nova subcategoria</button>
+                </td>
+              </tr>
+            </template>
+          </draggable>
+        </template>
+
+        <template #footer>
+          <tbody v-if="!localCategories.length">
+            <tr>
               <td colspan="5" class="td-empty">Nenhuma categoria cadastrada.</td>
             </tr>
-          </template>
-        </draggable>
-      </table>
+          </tbody>
+        </template>
+      </draggable>
     </div>
 
     <!-- Mobile: cards -->
@@ -239,14 +267,14 @@ async function deleteCategory(cat: Category) {
       v-model="topLevelCategories"
       class="card-list"
       item-key="id"
-      handle=".drag-handle"
+      handle=".drag-handle--parent"
       :animation="150"
       @end="handleDragEnd"
     >
       <template #item="{ element: cat }">
         <div class="card">
           <div class="card-top">
-            <Icon name="lucide:grip-vertical" class="drag-handle" />
+            <Icon name="lucide:grip-vertical" class="drag-handle drag-handle--parent" />
             <div
               class="gradient-dot"
               :style="{ '--from': `#${cat.gradient[0]}`, '--to': `#${cat.gradient[1]}` }"
@@ -259,17 +287,30 @@ async function deleteCategory(cat: Category) {
             <button class="action-edit" @click="openEdit(cat)">Editar</button>
             <button class="action-delete" @click="deleteCategory(cat)">Excluir</button>
           </div>
-          <div v-if="childrenOf(cat.id).length" class="children-list children-list--card">
-            <div v-for="(child, idx) in childrenOf(cat.id)" :key="child.id" class="child-row">
-              <span class="child-name">{{ child.name }}</span>
-              <div class="child-actions">
-                <button class="arrow-btn" :disabled="idx === 0" @click="moveChild(child, 'up')">↑</button>
-                <button class="arrow-btn" :disabled="idx === childrenOf(cat.id).length - 1" @click="moveChild(child, 'down')">↓</button>
-                <button class="action-edit" @click="openEdit(child)">Editar</button>
-                <button class="action-delete" @click="deleteCategory(child)">Excluir</button>
+          <draggable
+            v-if="childrenOf(cat.id).length"
+            :model-value="childrenOf(cat.id)"
+            tag="div"
+            class="children-list children-list--card"
+            item-key="id"
+            handle=".drag-handle--child"
+            :animation="150"
+            @update:model-value="(val: Category[]) => setChildren(cat.id, val)"
+            @end="handleChildDragEnd(cat.id)"
+          >
+            <template #item="{ element: child }">
+              <div class="child-row">
+                <div class="child-row-main">
+                  <Icon name="lucide:grip-vertical" class="drag-handle drag-handle--child" />
+                  <span class="child-name">{{ child.name }}</span>
+                </div>
+                <div class="child-actions">
+                  <button class="action-edit" @click="openEdit(child)">Editar</button>
+                  <button class="action-delete" @click="deleteCategory(child)">Excluir</button>
+                </div>
               </div>
-            </div>
-          </div>
+            </template>
+          </draggable>
           <button class="btn-new-sub" @click="openCreate(cat.id)">+ Nova subcategoria</button>
         </div>
       </template>
@@ -425,10 +466,6 @@ async function deleteCategory(cat: Category) {
 }
 
 .td-name {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
   font-weight: 600;
 }
 
@@ -438,12 +475,30 @@ async function deleteCategory(cat: Category) {
   gap: 10px;
 }
 
+.table-row--child .td-name {
+  padding-left: 44px;
+  font-weight: 500;
+  color: var(--adm-text-secondary);
+}
+
+.table-row--parent {
+  background: var(--adm-surface-alt);
+  border-top: 2px solid var(--adm-border);
+}
+
+.table-row--child:nth-of-type(even) {
+  background: var(--adm-surface-alt);
+}
+
+.table-row--new-sub td {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
 .children-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-left: 38px;
-  width: 100%;
 }
 
 .children-list--card {
@@ -461,6 +516,12 @@ async function deleteCategory(cat: Category) {
   font-size: 13px;
 }
 
+.child-row-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .child-name {
   color: var(--adm-text-secondary);
 }
@@ -469,22 +530,6 @@ async function deleteCategory(cat: Category) {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.arrow-btn {
-  background: none;
-  border: none;
-  color: var(--adm-text-muted);
-  cursor: pointer;
-  font-size: 13px;
-  padding: 0 2px;
-}
-.arrow-btn:hover:not(:disabled) {
-  color: var(--adm-accent);
-}
-.arrow-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
 }
 
 .btn-new-sub {
@@ -527,6 +572,10 @@ async function deleteCategory(cat: Category) {
 }
 .drag-handle:active {
   cursor: grabbing;
+}
+.drag-handle--child {
+  width: 15px;
+  height: 15px;
 }
 
 .table-row.sortable-chosen {
