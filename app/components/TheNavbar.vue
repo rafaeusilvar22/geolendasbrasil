@@ -188,34 +188,38 @@ function submitSearch() {
             <span v-if="s.category" class="suggestion-cat">{{ s.category.name }}</span>
           </button>
         </div>
-        <button class="search-toggle" aria-label="Buscar" @click="toggleSearch">
-          <Icon :name="searchOpen ? 'heroicons:x-mark' : 'heroicons:magnifying-glass'" class="theme-icon" />
-        </button>
+        <label class="swap swap-rotate search-toggle" aria-label="Buscar">
+          <input type="checkbox" :checked="searchOpen" @change="toggleSearch" />
+          <Icon name="heroicons:x-mark" class="swap-on theme-icon" />
+          <Icon name="heroicons:magnifying-glass" class="swap-off theme-icon" />
+        </label>
       </div>
 
-      <button
-        class="theme-toggle"
-        :aria-label="theme === 'pergaminho' ? 'Ativar modo escuro' : 'Ativar modo claro'"
-        @click="toggle"
-      >
-        <ClientOnly>
-          <Icon :name="theme === 'pergaminho' ? 'heroicons:moon' : 'heroicons:sun'" class="theme-icon" />
-          <template #fallback>
+      <ClientOnly>
+        <label
+          class="swap swap-rotate theme-toggle"
+          :aria-label="theme === 'pergaminho' ? 'Ativar modo escuro' : 'Ativar modo claro'"
+        >
+          <input type="checkbox" :checked="theme === 'penumbra'" @change="toggle" />
+          <Icon name="heroicons:sun" class="swap-on theme-icon" />
+          <Icon name="heroicons:moon" class="swap-off theme-icon" />
+        </label>
+        <template #fallback>
+          <span class="theme-toggle" aria-hidden="true">
             <Icon name="heroicons:moon" class="theme-icon" />
-          </template>
-        </ClientOnly>
-      </button>
+          </span>
+        </template>
+      </ClientOnly>
 
-      <button
-        class="menu-toggle"
-        :aria-expanded="menuOpen"
-        aria-label="Menu"
-        @click="menuOpen = !menuOpen"
-      >
-        <span class="menu-bar" />
-        <span class="menu-bar" />
-        <span class="menu-bar" />
-      </button>
+      <label class="swap swap-rotate menu-toggle" :aria-expanded="menuOpen">
+        <input type="checkbox" aria-label="Menu" :checked="menuOpen" @change="menuOpen = !menuOpen" />
+        <span class="swap-off menu-icon">
+          <span class="menu-bar" />
+          <span class="menu-bar" />
+          <span class="menu-bar" />
+        </span>
+        <Icon name="heroicons:x-mark" class="swap-on menu-close-icon" />
+      </label>
     </div>
 
     <div class="mobile-menu" :class="{ 'mobile-menu--open': menuOpen }">
@@ -514,16 +518,10 @@ function submitSearch() {
 }
 
 .search-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  cursor: pointer;
   padding: 8px;
   border-radius: 6px;
   color: rgba(216, 210, 230, 0.75);
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 .search-toggle:hover {
   background: rgba(216, 210, 230, 0.08);
@@ -531,16 +529,10 @@ function submitSearch() {
 }
 
 .theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  cursor: pointer;
   padding: 8px;
   border-radius: 6px;
   color: rgba(216, 210, 230, 0.75);
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 .theme-toggle:hover {
   background: rgba(216, 210, 230, 0.08);
@@ -554,13 +546,13 @@ function submitSearch() {
 
 .menu-toggle {
   display: none;
+  padding: 8px;
+}
+.menu-icon {
+  display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
 }
 .menu-bar {
   display: block;
@@ -572,6 +564,11 @@ function submitSearch() {
 }
 .menu-toggle:hover .menu-bar {
   background: #C9A24B;
+}
+.menu-close-icon {
+  width: 20px;
+  height: 20px;
+  color: #D8D2E6;
 }
 
 .mobile-menu {
@@ -697,7 +694,7 @@ function submitSearch() {
   }
 
   .menu-toggle {
-    display: flex;
+    display: inline-grid;
   }
 }
 </style>

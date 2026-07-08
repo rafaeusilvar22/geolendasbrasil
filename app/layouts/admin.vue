@@ -1,11 +1,11 @@
 <script setup lang="ts">
 const client = useSupabaseClient()
 const user = useSupabaseUser()
-const drawerCheckbox = ref<HTMLInputElement>()
+const drawerOpen = ref(false)
 const { theme, toggle: toggleTheme } = useTheme()
 
 useRouter().afterEach(() => {
-  if (drawerCheckbox.value) drawerCheckbox.value.checked = false
+  drawerOpen.value = false
 })
 
 async function handleLogout() {
@@ -16,26 +16,39 @@ async function handleLogout() {
 
 <template>
   <div class="drawer">
-    <input id="admin-drawer" ref="drawerCheckbox" type="checkbox" class="drawer-toggle" />
+    <input id="admin-drawer" v-model="drawerOpen" type="checkbox" class="drawer-toggle" />
 
     <div class="drawer-content admin-layout">
       <header class="admin-header">
         <div class="admin-header-left">
-          <label for="admin-drawer" class="btn btn-ghost btn-square drawer-btn">
-            <Icon name="heroicons:bars-3" class="hamburger-icon" />
+          <label
+            for="admin-drawer"
+            class="btn btn-ghost btn-square swap swap-rotate drawer-btn"
+            :class="{ 'swap-active': drawerOpen }"
+          >
+            <Icon name="heroicons:bars-3" class="swap-off hamburger-icon" />
+            <Icon name="heroicons:x-mark" class="swap-on hamburger-icon" />
           </label>
           <span class="admin-title">{{ SITE_NAME }}</span>
         </div>
 
         <div class="admin-user">
           <span class="admin-email">{{ user?.email }}</span>
-          <button
-            class="theme-btn"
-            :aria-label="theme === 'pergaminho' ? 'Ativar modo escuro' : 'Ativar modo claro'"
-            @click="toggleTheme"
-          >
-            <Icon :name="theme === 'pergaminho' ? 'heroicons:moon' : 'heroicons:sun'" class="theme-icon" />
-          </button>
+          <ClientOnly>
+            <label
+              class="swap swap-rotate theme-btn"
+              :aria-label="theme === 'pergaminho' ? 'Ativar modo escuro' : 'Ativar modo claro'"
+            >
+              <input type="checkbox" :checked="theme === 'penumbra'" @change="toggleTheme" />
+              <Icon name="heroicons:sun" class="swap-on theme-icon" />
+              <Icon name="heroicons:moon" class="swap-off theme-icon" />
+            </label>
+            <template #fallback>
+              <span class="theme-btn" aria-hidden="true">
+                <Icon name="heroicons:moon" class="theme-icon" />
+              </span>
+            </template>
+          </ClientOnly>
           <button class="logout-btn" @click="handleLogout">Sair</button>
         </div>
       </header>
@@ -144,14 +157,9 @@ async function handleLogout() {
 }
 
 .theme-btn {
-  background: transparent;
-  border: none;
   color: rgba(216, 210, 230, 0.7);
-  cursor: pointer;
   padding: 6px;
   border-radius: 6px;
-  display: flex;
-  align-items: center;
   transition: color 0.2s ease, background 0.2s ease;
 }
 .theme-btn:hover {
