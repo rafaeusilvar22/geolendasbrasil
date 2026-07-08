@@ -33,6 +33,10 @@ const parentOptions = computed(() =>
   localCategories.value.filter(c => c.parent_id == null && c.id !== editingId.value),
 )
 
+const isEditingParent = computed(() =>
+  editingId.value != null && childrenOf(editingId.value).length > 0,
+)
+
 async function handleDragEnd() {
   reordering.value = true
   await Promise.all(
@@ -336,7 +340,7 @@ async function deleteCategory(cat: Category) {
             <span class="field-hint">Apenas letras, números e hífens.</span>
           </div>
 
-          <div class="field">
+          <div v-if="!isEditingParent" class="field">
             <label class="field-label" for="m-parent">Categoria pai</label>
             <select id="m-parent" v-model="form.parent_id" class="field-input">
               <option :value="null">Nenhuma (categoria de nível superior)</option>
