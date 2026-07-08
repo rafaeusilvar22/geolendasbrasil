@@ -36,6 +36,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       meta: [
+        { name: 'google-site-verification', content: 'EFiXuehATFPdnxc3S4xV01g438hZNkrVPsrIF4FMuKw' },
         { name: 'theme-color', content: '#151225' },
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
