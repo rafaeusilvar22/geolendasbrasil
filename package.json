@@ -29,6 +29,7 @@
     "satori": "^0.26.0",
     "vue": "^3.5.35",
     "vue-router": "^5.1.0",
+    "vue3-colorpicker": "^2.3.0",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {

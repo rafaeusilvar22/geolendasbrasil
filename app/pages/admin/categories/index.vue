@@ -360,12 +360,12 @@ async function deleteCategory(cat: Category) {
             <label class="field-label">Gradiente</label>
             <div class="gradient-row">
               <div class="gradient-input-group">
-                <span class="field-sublabel">Cor inicial (hex sem #)</span>
-                <input v-model="form.gradient_from" class="field-input" type="text" maxlength="6" placeholder="151225" />
+                <span class="field-sublabel">Cor inicial</span>
+                <AdminColorPickerField v-model="form.gradient_from" />
               </div>
               <div class="gradient-input-group">
-                <span class="field-sublabel">Cor final (hex sem #)</span>
-                <input v-model="form.gradient_to" class="field-input" type="text" maxlength="6" placeholder="C9A24B" />
+                <span class="field-sublabel">Cor final</span>
+                <AdminColorPickerField v-model="form.gradient_to" />
               </div>
               <div
                 class="gradient-preview"
